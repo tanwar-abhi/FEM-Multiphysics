@@ -1,0 +1,12 @@
+{
+    "tests":
+    [
+        {
+            "type" : "nodal",
+            "variable" : "Displacement",
+			"resultFile": "results/displacement.vtk",
+            "id" : 1,
+            "value" : 0.000142
+        }
+    ]
+}

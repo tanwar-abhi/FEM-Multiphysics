@@ -1,0 +1,11 @@
+{
+    "parts":
+    [
+        {
+            "name" : "part1",
+            "format"	: "gmsh",
+            "meshFileName"	: "meshes/2dRectPlate0.3x0.12_4NodeQuad_coarse.msh"
+        }
+    ]
+}
+

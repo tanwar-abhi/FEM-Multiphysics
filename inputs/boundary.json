@@ -1,0 +1,35 @@
+{
+    "dirichletBC":
+    [
+        {
+            "name" : "fixedXAxis",
+            "type" : "constant",
+            "variable" : "dispX",
+			"meshFile": "meshes/2dRectPlate0.3x0.12_4NodeQuad_coarse.msh",
+            "meshField" : "c4",
+            "value" : 0
+        },
+        {
+            "name" : "fixedYAxis",
+            "type" : "constant",
+            "variable" : "dispY",
+			"meshFile": "meshes/2dRectPlate0.3x0.12_4NodeQuad_coarse.msh",
+            "meshField" : "c4",
+            "value" : 0
+        }
+    ],
+
+
+    "neumannBC":
+    [
+        {
+            "name" : "pressure",
+            "type" : "constant",
+            "boundaryType" : "normalToBoundary",
+            "variable" : "pressure",
+			"meshFile": "meshes/2dRectPlate0.3x0.12_4NodeQuad_coarse.msh",
+            "meshField" : "c2",
+            "value" : 100000000
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    nodalOutputs:
+    [
+        {
+            "type": "all",
+            "frequency" : 10,
+            "nodesList" : To be completed,
+            "variable" : To be completed
+        }
+    ]
+}
