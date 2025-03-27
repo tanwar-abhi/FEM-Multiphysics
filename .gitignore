@@ -30,3 +30,27 @@
 *.exe
 *.out
 *.app
+
+
+# Ignore any package files
+*.tar.gz
+*.zip
+*.rar
+*.war
+*.jar
+
+
+# Exlude the build director created for building the code
+build/*
+.vscode/*
+inputs/*
+results/*
+
+
+# Exclude json input files and results files
+*.json
+*.vtk
+
+
+# Exclude executable
+RunCode

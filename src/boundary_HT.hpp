@@ -12,7 +12,8 @@
 #include <Eigen/Geometry>
 
 
-typedef Eigen::SparseMatrix<double> SpMatDouble;
+// typedef Eigen::SparseMatrix<double> SpMatDouble;
+typedef Eigen::SparseMatrix<double> SparseMatrixDouble;
 typedef Eigen::Triplet<double> Tr;
 
 
