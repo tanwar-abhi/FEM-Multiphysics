@@ -1,9 +1,12 @@
 
 #pragma once
-// #include <string>
-#include "Quadratures.hpp"
-// #include <cmath>
+
+#include "quadratures.hpp"
+
 // #include "../Libraries/Eigen/Core"
+
+// #include <string>
+// #include <cmath>
 #include <Eigen/Core>
 
 // The internal structure for Basis Function creation, used internally by the main classes i.e. primarily 

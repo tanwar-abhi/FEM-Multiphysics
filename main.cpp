@@ -7,17 +7,25 @@
 // #include "src/SolverInputs.hpp"
 // #include "src/Element.hpp"
 // #include "src/BoundaryInputs.hpp"
-#include "src/PostProcess.hpp"
-#include <iomanip>
-#include <string>
-#include "src/neumanBC.hpp"
-#include "src/PostProcess.hpp"
-#include "src/DirichletBC.hpp"
-#include "src/Matrix_Assemble.hpp"
+// #include "src/PostProcess.hpp"
+// #include "src/neumanBC.hpp"
+// #include "src/PostProcess.hpp"
+// #include "src/DirichletBC.hpp"
+// #include "src/Matrix_Assemble.hpp"
+
+#include "PostProcess.hpp"
+#include "neumanBC.hpp"
+#include "PostProcess.hpp"
+#include "DirichletBC.hpp"
+#include "Matrix_Assemble.hpp"
+
+
 // #include <Eigen/IterativeLinearSolvers>
 #include<Eigen/SparseLU>
 // #include<Eigen/SparseCholesky>
 
+#include <iomanip>
+#include <string>
 
 int main()
 {

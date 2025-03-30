@@ -42,4 +42,14 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src)
 # message(STATUS "## Treat all warnings as errors")
 
 
+# Create executable
+add_executable(${PROJECT_NAME} main.cpp)
+
+
+target_link_libraries(${PROJECT_NAME} jsoncpp)
+target_link_libraries(${PROJECT_NAME} element)
+target_link_libraries(${PROJECT_NAME} postProcessing)
+target_link_libraries(${PROJECT_NAME} preProcessing)
+target_link_libraries(${PROJECT_NAME} inputsJson)
+target_link_libraries(${PROJECT_NAME} srcFunction)
 
