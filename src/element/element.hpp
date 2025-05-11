@@ -1,19 +1,20 @@
 /*
- * Element.hpp
+ * element.hpp
  *
  *  Created on: 03-Oct-2021
  *      Author: pardhagv
- */
+*/
 
 #ifndef SRC_ELEMENT_HPP_
 #define SRC_ELEMENT_HPP_
+
+#include "readMesh.hpp"
+#include "basisFunction.hpp"
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <set>
-#include "readMesh.hpp"
-#include "BasisFunction.hpp"
 
 class Element{
     private:

@@ -3,7 +3,7 @@
 #pragma once
 // #include "BasisFunction.hpp"
 // #include "readMesh.hpp"
-#include "Boundary_HT.hpp"
+#include "boundary_HT.hpp"
 // #include "Material.hpp"
 // #include "SolverInputs.hpp"
 // #include "BoundaryInputs.hpp"

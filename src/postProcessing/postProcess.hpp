@@ -1,12 +1,13 @@
 // Post Process functions defined here to call upon after solver i.e. post calculation of results
 
 #pragma once
+
+#include "Matrix_Assemble.hpp"
+
 #include <fstream>
 #include <cstdio>
 #include <iostream>
 #include <iomanip>
-#include "Matrix_Assemble.hpp"
-
 
 // Function to generate the vtk files that would be read by ParaView for post processing.
 void GenerateVTK(std::string fileName, const std::vector<std::vector<double>> &NODE_COORD, const Element &meshElement, const Equation &equation, const Eigen::MatrixXd &Solution);

@@ -9,3 +9,4 @@ add_library(preProcessing STATIC ${preProcessingCode})
 
 # Add directory to the current static shared library
 target_include_directories(preProcessing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(preProcessing PUBLIC ${CMAKE_SOURCE_DIR}/src/readJsonInputs)

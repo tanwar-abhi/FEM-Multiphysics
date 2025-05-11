@@ -13,10 +13,9 @@
 // #include "src/DirichletBC.hpp"
 // #include "src/Matrix_Assemble.hpp"
 
-#include "PostProcess.hpp"
 #include "neumanBC.hpp"
-#include "PostProcess.hpp"
-#include "DirichletBC.hpp"
+#include "postProcess.hpp"
+#include "dirichletBC.hpp"
 #include "Matrix_Assemble.hpp"
 
 

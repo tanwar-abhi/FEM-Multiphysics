@@ -1,5 +1,5 @@
 
-#include "PostProcess.hpp"
+#include "postProcess.hpp"
 
 
 
@@ -183,7 +183,6 @@ void ExportCSV(const Eigen::MatrixXd &Solution, std::string fileName)
         exit(1);
     }
 
-
     std::cout << "## Writing out data to a csv file = " << fileName <<std::endl;
 
     // const Eigen::IOFormat CSVFormat(Eigen::FullPrecision, Eigen::DontAlignCols, ",","\n");
@@ -320,8 +319,6 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
                 Nmat.row(0) << BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5), 0, BasisFn.N(i,6), 0, BasisFn.N(i,7), 0, BasisFn.N(i,8), 0;
                 Nmat.row(1) << 0, BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5), 0, BasisFn.N(i,6), 0, BasisFn.N(i,7), 0, BasisFn.N(i,8);
             }
-            
-
         }
     }
 

@@ -1,6 +1,6 @@
 
 
-#include "BasisFunction.hpp"
+#include "basisFunction.hpp"
 
 
 

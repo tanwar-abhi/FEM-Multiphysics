@@ -1,5 +1,5 @@
 
-#include "DirichletBC.hpp"t
+#include "dirichletBC.hpp"
 
 
 // Search the DB induced node number data to obtain rows and columns number to be eliminated from stiffness matrix

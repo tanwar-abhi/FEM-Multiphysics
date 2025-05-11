@@ -6,12 +6,16 @@
 //        the boundary PhysicalNames within GMSH.
 
 #pragma once
+
+#include "partInputs.hpp"
+
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <set>
 #include <algorithm>
-#include "PartInputs.hpp"
 
 class readMesh{
     private:

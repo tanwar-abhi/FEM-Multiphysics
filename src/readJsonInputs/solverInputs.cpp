@@ -1,5 +1,5 @@
 
-#include "SolverInputs.hpp"
+#include "solverInputs.hpp"
 
 
 Equation::Equation(){

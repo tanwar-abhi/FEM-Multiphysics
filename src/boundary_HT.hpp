@@ -2,12 +2,14 @@
 // for the heat transfer problems.
 
 #pragma once
-#include "BasisFunction.hpp"
+
+#include "basisFunction.hpp"
 #include "readMesh.hpp"
-#include "SolverInputs.hpp"
-#include "BoundaryInputs.hpp"
-#include "Material.hpp"
-#include "Element.hpp"
+#include "solverInputs.hpp"
+#include "boundaryInputs.hpp"
+#include "material.hpp"
+#include "element.hpp"
+
 #include <Eigen/SparseCore>
 #include <Eigen/Geometry>
 

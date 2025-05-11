@@ -1,6 +1,6 @@
 
 #include <cmath>
-#include "Quadratures.hpp"
+#include "quadratures.hpp"
 
 Quad1D::Quad1D()
 {

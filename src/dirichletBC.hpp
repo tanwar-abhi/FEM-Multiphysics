@@ -1,11 +1,14 @@
 
 #pragma once
-#include <set>
+
+#include "boundaryInputs.hpp"
+#include "element.hpp"
+#include "solverInputs.hpp"
+
 // #include <map>
 #include <Eigen/SparseCore>
-#include "BoundaryInputs.hpp"
-#include "Element.hpp"
-#include "SolverInputs.hpp"
+
+#include <set>
 
 typedef Eigen::SparseMatrix<double> SpMatDouble;
 typedef Eigen::Triplet<double> Tr;

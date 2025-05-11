@@ -1,5 +1,5 @@
 
-#include "Material.hpp"
+#include "material.hpp"
 #include <cmath>
 
 // Definition of the Material class constructor and destructor

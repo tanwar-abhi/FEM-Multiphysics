@@ -1,9 +1,5 @@
 
 #include "readMesh.hpp"
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include "PartInputs.hpp"
 
 readMesh::readMesh(){
     // Default constructor

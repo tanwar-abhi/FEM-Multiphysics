@@ -1,16 +1,19 @@
 #pragma once
 
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/value.h>
+
+
 #include <fstream>
-#include <json/json.h>
-#include <json/value.h>
 #include <iostream>
 #include <string>
 #include <algorithm>
 
-class Part{
+class Part {
     public:
     Part();
     ~Part();
+    Part(const std::string m_name, const std::string m_format, const std::string m_meshFileName);
 
     std::string name;
     std::string format;
@@ -18,7 +21,7 @@ class Part{
 };
 
 
-class PartsInp{
+class PartsInp {
     public:
     PartsInp();
     ~PartsInp();

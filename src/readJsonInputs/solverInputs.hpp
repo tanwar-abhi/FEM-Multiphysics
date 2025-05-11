@@ -1,16 +1,16 @@
 // Data Structures for solver input files
 
-
 #pragma once
+
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/value.h>
+
 #include <string>
 #include <algorithm>
 #include <fstream>
-#include <json/json.h>
-#include <json/value.h>
 #include <iostream>
 
-
-class Equation{
+class Equation {
 
     public:
     Equation();
@@ -57,7 +57,7 @@ class Equation{
     int ocType = 0;
 };
 
-class SolverInp{
+class SolverInp {
 
     public:
     SolverInp();

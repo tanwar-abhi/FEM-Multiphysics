@@ -1,12 +1,14 @@
 
 #pragma once
+
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/json.h>
+
 #include <vector>
 #include <string>
 #include <Eigen/Core>
 #include <algorithm>
 #include <fstream>
-#include <json/value.h>
-#include <json/json.h>
 #include <iostream>
 
 

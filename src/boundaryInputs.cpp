@@ -1,5 +1,5 @@
 
-#include "BoundaryInputs.hpp"
+#include "boundaryInputs.hpp"
 
 
 DirichletBC::DirichletBC(){

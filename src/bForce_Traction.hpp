@@ -2,14 +2,17 @@
 //  and impose Traction forces on the Neuman/Natural boundary of domain.
 
 #pragma once
-#include "../Libraries/Eigen/Dense"
-#include "BasisFunction.hpp"
+
+#include "basisFunction.hpp"
 #include "readMesh.hpp"
+#include "boundary_HT.hpp"
+// #include "ProblemParameters.hpp"
+
+// #include "../Libraries/Eigen/Dense"
+#include <Eigen/Sparse>
+
 #include <set>
 #include <cmath>
-#include "ProblemParameters.hpp"
-#include "Boundary_HT.hpp"
-
 
 // Initialize a vector of Body Forces based on value defined by user
 // inputs -> BForce : BodyForce vector; BFV : Body Force values

@@ -1,5 +1,5 @@
 
-#include "PartInputs.hpp"
+#include "partInputs.hpp"
 
 Part::Part()
 {
@@ -9,6 +9,13 @@ Part::Part()
 Part::~Part()
 {
 
+}
+
+Part::Part(const std::string m_name, const std::string m_format, const std::string m_meshFileName)
+{
+    name = m_name;
+    format = m_format;
+    meshFileName = m_meshFileName;
 }
 
 PartsInp::PartsInp()
