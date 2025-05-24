@@ -4,29 +4,29 @@
 
 
 
-BasisFn::BasisFn(){
+BasisFunction::BasisFunction(){
     // Default constructor
 }
 
-BasisFn::~BasisFn(){
+BasisFunction::~BasisFunction(){
     // Default Destructor
 }
 
 
 // Constructor for creating BasisFun Object
-BasisFn::BasisFn(int ngp, int eType)
+BasisFunction::BasisFunction(int ngp, int eType)
 {
     this->NGP = ngp;
     this->Etype = eType;
 }
 
 
-ShapeFn3D::ShapeFn3D()
+ShapeFunction3D::ShapeFunction3D()
 {
     // Default Constructor
 }
 
-ShapeFn3D::~ShapeFn3D()
+ShapeFunction3D::~ShapeFunction3D()
 {
     // Default Destructor
 }
@@ -34,7 +34,7 @@ ShapeFn3D::~ShapeFn3D()
 
 
 
-std::vector<Eigen::MatrixXd> BasisFn::ShapeFn_1D(int const ngp)
+std::vector<Eigen::MatrixXd> BasisFunction::shapeFunction_1D(int const ngp)
 {
     // Element initialized for 1d Gauss Quadratures
     Quad1D GQelement;
@@ -112,7 +112,7 @@ std::vector<Eigen::MatrixXd> BasisFn::ShapeFn_1D(int const ngp)
 }
 
 
-std::vector<Eigen::MatrixXd> BasisFn::ShapeFn_2D(const int NGP)
+std::vector<Eigen::MatrixXd> BasisFunction::shapeFunction_2D(const int NGP)
 {
     Quad2d GQelement;
     std::vector<Quad2d> GQ = GQelement.GaussQuad(NGP, Etype);
@@ -296,17 +296,17 @@ std::vector<Eigen::MatrixXd> BasisFn::ShapeFn_2D(const int NGP)
 }
 
 
-ShapeFn1D::ShapeFn1D(){
+ShapeFunction1D::ShapeFunction1D(){
     // Default constructor
 }
 
-ShapeFn1D::~ShapeFn1D(){
-    // Default Destructor for ShapeFn1D
+ShapeFunction1D::~ShapeFunction1D(){
+    // Default Destructor for ShapeFunction1D
 }
 
 
-// void ShapeFn1D::getShapeFn(const int gp, int ET)
-void ShapeFn1D::getShapeFn(int ET)
+// void ShapeFunction1D::getShapeFunction(const int gp, int ET)
+void ShapeFunction1D::getShapeFunction(int ET)
 {
     // 2noded line, linear line element
     if (ET == 1)
@@ -321,10 +321,10 @@ void ShapeFn1D::getShapeFn(int ET)
 
     // this->NGP = gp;
     
-    BasisFn BFn(NGP, ET);
+    BasisFunction BFn(NGP, ET);
     
     std::vector<Eigen::MatrixXd> results;
-    results = BFn.ShapeFn_1D(NGP);
+    results = BFn.shapeFunction_1D(NGP);
 
     this->eType = BFn.Etype;
     this->WGP = BFn.wgp;
@@ -345,15 +345,15 @@ void ShapeFn1D::getShapeFn(int ET)
 
 
 
-void ShapeFn1D::getShapeFn(int ET, int gp)
+void ShapeFunction1D::getShapeFunction(int ET, int gp)
 {
 
     this->NGP = gp;
 
-    BasisFn BFn(NGP, ET);
+    BasisFunction BFn(NGP, ET);
 
     std::vector<Eigen::MatrixXd> results;
-    results = BFn.ShapeFn_1D(NGP);
+    results = BFn.shapeFunction_1D(NGP);
 
     this->eType = BFn.Etype;
     this->WGP = BFn.wgp;
@@ -374,19 +374,19 @@ void ShapeFn1D::getShapeFn(int ET, int gp)
 
 
 
-ShapeFn2D::ShapeFn2D(){
+ShapeFunction2D::ShapeFunction2D(){
     // Default constructor for 2D shape function object
 }
 
 
-ShapeFn2D::~ShapeFn2D(){
+ShapeFunction2D::~ShapeFunction2D(){
     // Default constructor for shape function object
 }
 
 
 // Overload function, used for generating 2D shape functions
-// void ShapeFn2D::getShapeFn(int gp, int ET)
-void ShapeFn2D::getShapeFn(int ET)
+// void ShapeFunction2D::getShapeFunction(int gp, int ET)
+void ShapeFunction2D::getShapeFunction(int ET)
 {
     // Setting gauss point for basis function
     // this->NGP = gp;
@@ -402,16 +402,16 @@ void ShapeFn2D::getShapeFn(int ET)
     }
 
     // Create object of Basis Function for required gauss points and elementType
-    BasisFn BFn(NGP, ET);
+    BasisFunction BFn(NGP, ET);
     
     std::vector<Eigen::MatrixXd> results;
-    results = BFn.ShapeFn_2D(NGP);
+    results = BFn.shapeFunction_2D(NGP);
 
-    // Binds elemnt type and weights for 2D element to object of ShapeFn2D
+    // Binds elemnt type and weights for 2D element to object of shapeFunction2D
     this->eType = BFn.Etype;
     this->WGP = BFn.wgp;
 
-    // Bind all shape function and it's derivative to the object of ShapeFn2D
+    // Bind all shape function and it's derivative to the object of shapeFunction2D
     N = Eigen::MatrixXd::Zero(results[0].rows(), results[0].cols());
     Nxi = Eigen::MatrixXd::Zero(results[1].rows(), results[1].cols());
     N2xi = Eigen::MatrixXd::Zero(results[2].rows(), results[2].cols());
@@ -431,22 +431,22 @@ void ShapeFn2D::getShapeFn(int ET)
 
 
 
-void ShapeFn2D::getShapeFn(int ET, int gp)
+void ShapeFunction2D::getShapeFunction(int ET, int gp)
 {
     // Setting gauss point for basis function
     this->NGP = gp;
 
     // Create object of Basis Function for required gauss points and elementType
-    BasisFn BFn(NGP, ET);
+    BasisFunction BFn(NGP, ET);
     
     std::vector<Eigen::MatrixXd> results;
-    results = BFn.ShapeFn_2D(NGP);
+    results = BFn.shapeFunction_2D(NGP);
 
-    // Binds elemnt type and weights for 2D element to object of ShapeFn2D
+    // Binds elemnt type and weights for 2D element to object of shapeFunction2D
     this->eType = BFn.Etype;
     this->WGP = BFn.wgp;
 
-    // Bind all shape function and it's derivative to the object of ShapeFn2D
+    // Bind all shape function and it's derivative to the object of shapeFunction2D
     N = Eigen::MatrixXd::Zero(results[0].rows(), results[0].cols());
     Nxi = Eigen::MatrixXd::Zero(results[1].rows(), results[1].cols());
     N2xi = Eigen::MatrixXd::Zero(results[2].rows(), results[2].cols());
@@ -464,7 +464,7 @@ void ShapeFn2D::getShapeFn(int ET, int gp)
 
 
 
-void ShapeFn3D::getShapeFn(int elemType, int ngp)
+void ShapeFunction3D::getShapeFunction(int elemType, int ngp)
 {
     // Number of gauss points
     this->NGP = ngp;

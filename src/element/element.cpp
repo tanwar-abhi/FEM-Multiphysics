@@ -120,7 +120,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->Nodes.push_back(node2 + startingNodeId);
 						
 						this->numNodesElem = 2;
-						this->basisFn1D.getShapeFn(etype);
+						this->shapeFunction1D.getShapeFunction(etype);
 					}
 					this->ElemConnectivity.push_back(lclElemCnn);
 					this->numElems++;
@@ -156,7 +156,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->Nodes.push_back(node3 + startingNodeId);
 
 						this->numNodesElem = 3;
-						this->basisFn2D.getShapeFn(etype, 3);
+						this->shapeFunction2D.getShapeFunction(etype, 3);
 					}
 					// Three noded second order line
 					else if (etype == 8)
@@ -171,7 +171,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->Nodes.push_back(node3 + startingNodeId);
 
 						this->numNodesElem = 3;
-						this->basisFn1D.getShapeFn(etype, 3);
+						this->shapeFunction1D.getShapeFunction(etype, 3);
 					}
 					this->elemType = etype;
 					this->ElemConnectivity.push_back(lclElemCnn);
@@ -207,7 +207,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->Nodes.push_back(node4 + startingNodeId);
 
 						this->numNodesElem = 4;
-						this->basisFn2D.getShapeFn(etype);
+						this->shapeFunction2D.getShapeFunction(etype);
 					}
 
 					// 4 node tetrahedron element
@@ -253,7 +253,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->Nodes.push_back(node6 + startingNodeId);
 
 						this->numNodesElem = 6;
-						this->basisFn2D.getShapeFn(etype);
+						this->shapeFunction2D.getShapeFunction(etype);
 					}
 					this-> elemType = etype;
 					this->ElemConnectivity.push_back(lclElemCnn);
@@ -279,7 +279,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 					if (etype == 5)
 					{
 						this->numNodesElem = 8;
-						this->basisFn3D.getShapeFn(etype, 8);
+						this->shapeFunction3D.getShapeFunction(etype, 8);
 						for (int i = 0; i < numNodesElem; i++)
 						{
 							ss >> nodes;
@@ -336,7 +336,7 @@ void Element::readElement(const readMesh &mesh, int tagId)
 						this->ElemConnectivity.push_back(lclElemCnn);
 						this->numElems++;
 
-						this->basisFn2D.getShapeFn(etype);
+						this->shapeFunction2D.getShapeFunction(etype);
 					}
 				}
 			}

@@ -30,25 +30,25 @@ int main()
 {
 
     //Object containing mesh parts defined by the user in the parts Input file
-    PartsInp partsInpObj;
-    partsInpObj.readPartInputs();
+    PartsInp partsInput;
+    partsInput.readPartInputs();
 
     // Oject containing solver inputs defined by user in the inputs file
-    SolverInp solverInpObj;
-    solverInpObj.readInputs();
+    SolverInp solverInput;
+    solverInput.readInputs();
 
     // Material vector objects containing material details for problem
     std::vector<MaterialThermal> materialThermal;
     std::vector<LinearElasticMaterial> material_LE;
 
     // Read Material properties based on the equations defined in user input files
-    for (int i = 0; i < solverInpObj.nEquations; i++)
+    for (int i = 0; i < solverInput.nEquations; i++)
     {
         // Linearly elastic material
-        if (solverInpObj.equations[i].solverEq == 1 || solverInpObj.equations[i].solverEq == 13 || solverInpObj.equations[i].solverEq == 14)
+        if (solverInput.equations[i].solverEq == 1 || solverInput.equations[i].solverEq == 13 || solverInput.equations[i].solverEq == 14)
             material_LE = LinearElasticMaterial::readMaterialInputs();
         // Thermal problem
-        else if (solverInpObj.equations[i].solverEq == 2){
+        else if (solverInput.equations[i].solverEq == 2){
             materialThermal = MaterialThermal::readMaterialInputs();
         }
     }
@@ -60,7 +60,7 @@ int main()
 
 
     // Read mesh object constructor.
-    readMesh mesh(partsInpObj, solverInpObj.dimension);
+    readMesh mesh(partsInput, solverInput.dimension);
 
     // Read elements
     Element meshElements[mesh.NElementalTags];
@@ -72,14 +72,14 @@ int main()
     }
 
     // Mapping mesh with the equation
-    for (int eqn = 0; eqn < solverInpObj.nEquations; eqn++)
+    for (int eqn = 0; eqn < solverInput.nEquations; eqn++)
     {
         for (int elemTagId = 0; elemTagId < mesh.NElementalTags; elemTagId++)
         {
-            // std::cout<< solverInpObj.equations[eqn].meshFile << " " << mesh.elementalTagsMeshName[elemTagId] << " " << solverInpObj.equations[eqn].meshField << " " << mesh.elementalTags[elemTagId] << std::endl;
-            if ((solverInpObj.equations[eqn].meshFile == mesh.elementalTagsMeshName[elemTagId]) && (solverInpObj.equations[eqn].meshField == mesh.elementalTags[elemTagId]))
+            // std::cout<< solverInput.equations[eqn].meshFile << " " << mesh.elementalTagsMeshName[elemTagId] << " " << solverInput.equations[eqn].meshField << " " << mesh.elementalTags[elemTagId] << std::endl;
+            if ((solverInput.equations[eqn].meshFile == mesh.elementalTagsMeshName[elemTagId]) && (solverInput.equations[eqn].meshField == mesh.elementalTags[elemTagId]))
             {
-                solverInpObj.equations[eqn].elemTagId = elemTagId;
+                solverInput.equations[eqn].elemTagId = elemTagId;
                 break;
             }
         }
@@ -100,7 +100,7 @@ int main()
     }
 
     // Mapping mesh with the initial boundaries
-    if (solverInpObj.isTransient){
+    if (solverInput.isTransient){
         for (int index = 0; index < boundary.nIBC; index++)
         {
             for (int elemTagId = 0; elemTagId < mesh.NElementalTags; elemTagId++)
@@ -130,18 +130,18 @@ int main()
 
 
     // Mapping material property of domain to equation
-    for (int index = 0; index < solverInpObj.nEquations; index++){
-        int solverEquation = solverInpObj.equations[index].solverEq;
+    for (int index = 0; index < solverInput.nEquations; index++){
+        int solverEquation = solverInput.equations[index].solverEq;
         if (solverEquation == 2){
             for (int matIndex = 0, nMaterials = materialThermal.size(); matIndex < nMaterials; matIndex++){
-                if (solverInpObj.equations[index].materialPropName == materialThermal[matIndex].name)
-                    materialThermal[matIndex].elemTagId = solverInpObj.equations[index].elemTagId;
+                if (solverInput.equations[index].materialPropName == materialThermal[matIndex].name)
+                    materialThermal[matIndex].elemTagId = solverInput.equations[index].elemTagId;
             }
         }
         else if (solverEquation == 1 || solverEquation == 13 || solverEquation == 14){
             for (int matIndex = 0, nMaterials = material_LE.size(); matIndex < nMaterials; matIndex++){
-                if (solverInpObj.equations[index].materialPropName == material_LE[matIndex].name)
-                    material_LE[matIndex].elemTagId = solverInpObj.equations[index].elemTagId;
+                if (solverInput.equations[index].materialPropName == material_LE[matIndex].name)
+                    material_LE[matIndex].elemTagId = solverInput.equations[index].elemTagId;
             }
         }
     }
@@ -152,14 +152,14 @@ int main()
 
     // Global Stiffness Matrix and Force vector
     Eigen::SparseMatrix<double> K(mesh.NNodes, mesh.NNodes);
-    // Eigen::SparseMatrix<double> K(mesh.NNodes*solverInpObj.equations[0].DOF, mesh.NNodes*solverInpObj.equations[0].DOF);
+    // Eigen::SparseMatrix<double> K(mesh.NNodes*solverInput.equations[0].DOF, mesh.NNodes*solverInput.equations[0].DOF);
     K.setZero();
 
-    Eigen::VectorXd f(mesh.NNodes * solverInpObj.equations[0].DOF);
+    Eigen::VectorXd f(mesh.NNodes * solverInput.equations[0].DOF);
     f.setZero();
 
     // Transient Solver
-    if (solverInpObj.isTransient)
+    if (solverInput.isTransient)
     {
         /*
         ** TODO be updated as per the new and imporved function
@@ -177,33 +177,33 @@ int main()
         std::vector<Tr> tripletMass;
 
 
-        for (int eqn=0; eqn < solverInpObj.nEquations; eqn++)
+        for (int eqn=0; eqn < solverInput.nEquations; eqn++)
         {
             // Tag for domain element
-            int domainElemTag = solverInpObj.equations[eqn].elemTagId;
+            int domainElemTag = solverInput.equations[eqn].elemTagId;
 
             // Thermal problem stiffness matrix
-            if (solverInpObj.equations[eqn].solverEq == 2)
+            if (solverInput.equations[eqn].solverEq == 2)
             {
-                // f = Eigen::VectorXd::Zero(mesh.NNodes * solverInpObj.equations[eqn].DOF);
+                // f = Eigen::VectorXd::Zero(mesh.NNodes * solverInput.equations[eqn].DOF);
 
                 // Assemble the global stiffness matrix and Force vector for thermal problem using triplets
-                assembleMatrixHT(tripletStiffness, tripletMass, f, mesh.Node_Coord, meshElements, domainElemTag, solverInpObj, materialThermal, boundary);
+                assembleMatrixHT(tripletStiffness, tripletMass, f, mesh.Node_Coord, meshElements, domainElemTag, solverInput, materialThermal, boundary);
 
                 // Apply thermal neumann Boundary conditions
-                applyThermalNBC(tripletStiffness, f, boundary, meshElements, mesh, solverInpObj,  materialThermal[0]);
+                applyThermalNBC(tripletStiffness, f, boundary, meshElements, mesh, solverInput,  materialThermal[0]);
 
             }
 
             // Linear elastic problem striffness matrix
-            if (solverInpObj.equations[eqn].solverEq == 1 || solverInpObj.equations[eqn].solverEq == 13 || solverInpObj.equations[eqn].solverEq == 14)
+            if (solverInput.equations[eqn].solverEq == 1 || solverInput.equations[eqn].solverEq == 13 || solverInput.equations[eqn].solverEq == 14)
             {
-                // f = Eigen::VectorXd::Zero(mesh.NNodes * solverInpObj.equations[eqn].DOF);
+                // f = Eigen::VectorXd::Zero(mesh.NNodes * solverInput.equations[eqn].DOF);
 
-                assembleMatrixLE(tripletStiffness, f, mesh.Node_Coord, meshElements[domainElemTag], domainElemTag, solverInpObj, material_LE, boundary, eqn);
+                assembleMatrixLE(tripletStiffness, f, mesh.Node_Coord, meshElements[domainElemTag], domainElemTag, solverInput, material_LE, boundary, eqn);
 
                 // Apply structure neumann Boundary conditions
-                applyStructureNBC(f, mesh, meshElements, solverInpObj, material_LE[0], boundary, eqn);
+                applyStructureNBC(f, mesh, meshElements, solverInput, material_LE[0], boundary, eqn);
 
             }
         }
@@ -216,7 +216,7 @@ int main()
 
 
         // Apply all dirichlet boundary conditions defined by user in boundary.json and generate reduced stiffness matrix
-        K = applyDirichletBC(tripletStiffness, f, meshElements, boundary, solverInpObj, mesh.NNodes);
+        K = applyDirichletBC(tripletStiffness, f, meshElements, boundary, solverInput, mesh.NNodes);
 
 
         // ########### Check the time taken for compressed vs uncompressd CCS matrix ###########
@@ -229,7 +229,7 @@ int main()
         // ExportCSV(f, "results/f-thermal.csv");
 
         // Classical algorithm
-        if (solverInpObj.algorithm == 1)
+        if (solverInput.algorithm == 1)
         {
             // Solver Selection
             // CG was used due to symmetric and positive definate stiffness matrix.
@@ -254,7 +254,7 @@ int main()
             // ExportCSV(Sol_Reduced, "results/x-vector.csv");
         }
         // Qunatum algorithm
-        else if (solverInpObj.algorithm == 3)
+        else if (solverInput.algorithm == 3)
         {
             // Terminate the code to call upon the quantum linear solver
             // system("python quantumLinearSolver.py");
@@ -268,7 +268,7 @@ int main()
         if (boundary.nDBC != 0)
         {
             // Impose the dirichlet values to get the final solution
-            Solution = imposeDirichletValues(Sol_Reduced, meshElements, boundary, mesh.NNodes, solverInpObj.equations[0].DOF);
+            Solution = imposeDirichletValues(Sol_Reduced, meshElements, boundary, mesh.NNodes, solverInput.equations[0].DOF);
         }
         else{
             Solution = Sol_Reduced;
@@ -279,20 +279,20 @@ int main()
 
 
         // Post Processing for visualisation
-        for (int eqn = 0; eqn < solverInpObj.nEquations; eqn++)
+        for (int eqn = 0; eqn < solverInput.nEquations; eqn++)
         {
-            int domainElemTag = solverInpObj.equations[eqn].elemTagId;
+            int domainElemTag = solverInput.equations[eqn].elemTagId;
             std::string resultsFile;
 
             // Thermal problem results
-            if (solverInpObj.equations[eqn].solverEq == 2)
+            if (solverInput.equations[eqn].solverEq == 2)
                 resultsFile = "results/thermal.vtk";
 
             // Linear elastic problem results
-            else if (solverInpObj.equations[eqn].solverEq == 1 || solverInpObj.equations[eqn].solverEq == 13 || solverInpObj.equations[eqn].solverEq == 14){
+            else if (solverInput.equations[eqn].solverEq == 1 || solverInput.equations[eqn].solverEq == 13 || solverInput.equations[eqn].solverEq == 14){
                 resultsFile = "results/displacement.vtk";
             }
-            GenerateVTK(resultsFile, mesh.Node_Coord, meshElements[domainElemTag], solverInpObj.equations[eqn], Solution);
+            GenerateVTK(resultsFile, mesh.Node_Coord, meshElements[domainElemTag], solverInput.equations[eqn], Solution);
         }
     }
 

@@ -229,8 +229,8 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
 {
     Eigen::MatrixXd Stress;
 
-    ShapeFn2D BasisFn;
-    BasisFn.getShapeFn(mesh.elemType);
+    ShapeFn2D shapeFunction2D;
+    shapeFunction2D.getShapeFn(mesh.elemType);
 
     // Jacobian Matrix
     Eigen::Matrix2d Jacobian;
@@ -259,19 +259,19 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
             ct++;
         }
 
-        for (int i = 0; i < BasisFn.NGP; i++)
+        for (int i = 0; i < shapeFunction2D.NGP; i++)
         {
-            Eigen::VectorXd Nx(BasisFn.NGP);
-            Eigen::VectorXd Ny(BasisFn.NGP);
+            Eigen::VectorXd Nx(shapeFunction2D.NGP);
+            Eigen::VectorXd Ny(shapeFunction2D.NGP);
 
             // Calculate element Jacobian used to convert from natural (isoparametric) to global (Cartesian) coordinates.
-            Jacobian = Jacobian2D(Nx, Ny, Element_NC, BasisFn, i);
+            Jacobian = Jacobian2D(Nx, Ny, Element_NC, shapeFunction2D, i);
 
             // Strain-Displacement matrix and Matrix of Shape function
             Eigen::MatrixXd B, Nmat;
         
             // 3 node, linear triangle element
-            if (BasisFn.eType == 2)
+            if (shapeFunction2D.eType == 2)
             {
                 B = Eigen::MatrixXd::Zero(3, 6);
                 B.row(0) << Nx(0), 0, Nx(1), 0, Nx(2), 0;
@@ -279,11 +279,11 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 6);
-                Nmat.row(0) << BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2),0;
-                Nmat.row(1) << 0, BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2);
+                Nmat.row(0) << shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2),0;
+                Nmat.row(1) << 0, shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2);
             }
             // 4 node, linear quadrilateral element
-            else if (BasisFn.eType == 3)
+            else if (shapeFunction2D.eType == 3)
             {
                 B = Eigen::MatrixXd::Zero(3, 8);
                 B.row(0) << Nx(0), 0, Nx(1), 0, Nx(2), 0, Nx(3), 0;
@@ -291,12 +291,12 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 8);
-                Nmat.row(0) << BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0;
-                Nmat.row(1) << 0, BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3);
+                Nmat.row(0) << shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3), 0;
+                Nmat.row(1) << 0, shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3);
 
             }
             // 6 node, second order triangle element
-            else if (BasisFn.eType == 9)
+            else if (shapeFunction2D.eType == 9)
             {
                 B = Eigen::MatrixXd::Zero(3, 12);
                 B.row(0) << Nx(0), 0, Nx(1), 0, Nx(2), 0, Nx(3), 0, Nx(4), 0, Nx(5), 0;
@@ -304,11 +304,11 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3), Ny(4), Nx(4), Ny(5), Nx(5);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 12);
-                Nmat.row(0) << BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5), 0;
-                Nmat.row(1) << 0, BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5);
+                Nmat.row(0) << shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3), 0, shapeFunction2D.N(i,4), 0, shapeFunction2D.N(i,5), 0;
+                Nmat.row(1) << 0, shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3), 0, shapeFunction2D.N(i,4), 0, shapeFunction2D.N(i,5);
             }
             // Quadrilateral element, 2nd order {9 noded, quadratic interpolation}
-            else if (BasisFn.eType == 10)
+            else if (shapeFunction2D.eType == 10)
             {
                 B = Eigen::MatrixXd::Zero(3, 18);
                 B.row(0) << Nx(0), 0, Nx(1), 0, Nx(2), 0, Nx(3), 0, Nx(4), 0, Nx(5), 0, Nx(6), 0, Nx(7), 0, Nx(8), 0 ;
@@ -316,8 +316,8 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3), Ny(4), Nx(4), Ny(5), Nx(5), Ny(6), Nx(6), Ny(7), Nx(7), Ny(8), Nx(8);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 18);
-                Nmat.row(0) << BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5), 0, BasisFn.N(i,6), 0, BasisFn.N(i,7), 0, BasisFn.N(i,8), 0;
-                Nmat.row(1) << 0, BasisFn.N(i,0), 0, BasisFn.N(i,1), 0, BasisFn.N(i,2), 0, BasisFn.N(i,3), 0, BasisFn.N(i,4), 0, BasisFn.N(i,5), 0, BasisFn.N(i,6), 0, BasisFn.N(i,7), 0, BasisFn.N(i,8);
+                Nmat.row(0) << shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3), 0, shapeFunction2D.N(i,4), 0, shapeFunction2D.N(i,5), 0, shapeFunction2D.N(i,6), 0, shapeFunction2D.N(i,7), 0, shapeFunction2D.N(i,8), 0;
+                Nmat.row(1) << 0, shapeFunction2D.N(i,0), 0, shapeFunction2D.N(i,1), 0, shapeFunction2D.N(i,2), 0, shapeFunction2D.N(i,3), 0, shapeFunction2D.N(i,4), 0, shapeFunction2D.N(i,5), 0, shapeFunction2D.N(i,6), 0, shapeFunction2D.N(i,7), 0, shapeFunction2D.N(i,8);
             }
         }
     }

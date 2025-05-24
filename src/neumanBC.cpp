@@ -19,7 +19,7 @@ void applyThermalNBC(std::vector<Tr> &tripletStiffness, Eigen::VectorXd &f_Globa
             SurfaceConduction(f_Global, mesh.Node_Coord, meshElements[elementTag], solverInpObj, boundary.neumann[index], material);
         }
 
-        // Adding convection boundary contributions
+        // Adding convection boundary coBasisFnntributions
         if (boundary.neumann[index].variable == "CONVECTIVEHEATTRANSFER")
         {
             if (boundary.neumann[index].H != 0)

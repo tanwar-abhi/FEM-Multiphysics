@@ -45,9 +45,9 @@ class Element{
 	std::vector<unsigned int> Nodes;
 
 	// Shape function objects for respective element
-	ShapeFn2D basisFn2D;
-	ShapeFn1D basisFn1D;
-	ShapeFn3D basisFn3D;
+	ShapeFunction2D shapeFunction2D;
+	ShapeFunction1D shapeFunction1D;
+	ShapeFunction3D shapeFunction3D;
 };
 
 void checkNodes(int* , std::vector<int> , int , int* );
