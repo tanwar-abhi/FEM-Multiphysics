@@ -46,6 +46,7 @@ build/*
 inputs/*
 results/*
 documentation/*
+utilsDirectory/*
 
 
 # Exclude json input files and results files
@@ -55,3 +56,4 @@ documentation/*
 
 # Exclude executable
 RunCode
+
