@@ -31,11 +31,11 @@ struct BasisFunction{
     // ngp = no. og gauss points.
     // Returns a vector containing Shape functions for 1D element, return vecctor format ::
     // returnVector[0] = N; returnVector[1] = Nxi; returnVector[2] = N2xi; 
-    std::vector<Eigen::MatrixXd> ShapeFunction_1D(const int ngp);
+    std::vector<Eigen::MatrixXd> shapeFunction_1D(const int ngp);
 
     // Shape function for 2D element
     // Returns a vector containing Shape functions for 2D element
-    std::vector<Eigen::MatrixXd> ShapeFunction_2D(const int NGP);
+    std::vector<Eigen::MatrixXd> shapeFunction_2D(const int NGP);
 
 };
 

@@ -24,8 +24,8 @@ void LineHeatSource(Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> N
         nen = 3;
     }
 
-    ShapeFn1D BasisFn1D;
-    BasisFn1D.getShapeFn(mesh.BeType, nen);
+    ShapeFunction1D shapeFunction1D;
+    shapeFunction1D.getShapeFunction(mesh.BeType, nen);
 
     // Current element connectivity
     std::vector<unsigned int> Te(nen);
@@ -85,12 +85,12 @@ void LineHeatSource(Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> N
         }
         else{
             // Loop over integration points of 1D element
-            for (int j = 0; j < BasisFn1D.NGP; j++)
+            for (int j = 0; j < shapeFunction1D.NGP; j++)
             {
                 // Heat load vector contribution due to heat source/sink
                 // In 1d element det(Jacobian) = le/2
-                // f_Q += input.Q * BasisFn1D.N.row(j) * input.thickness * BasisFn1D.WGP[j] * le/2;
-                f_Q += boundary.Q * BasisFn1D.N.row(j) * materialDetails.thickness * BasisFn1D.WGP[j] * le/2;
+                // f_Q += input.Q * shapeFunction1D.N.row(j) * input.thickness * shapeFunction1D.WGP[j] * le/2;
+                f_Q += boundary.Q * shapeFunction1D.N.row(j) * materialDetails.thickness * shapeFunction1D.WGP[j] * le/2;
             }
         }
 
@@ -106,7 +106,7 @@ void LineHeatSource(Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> N
 
 
 /*/ Heat load vector contribution due to radiant heat flow
-void SurfaceRadiation(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD, const float thickness, readMesh mesh, const ProblemParameters::HeatTransfer_inp input)
+void SurfaceRadiation(ShapeFunction1D shapeFunction1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD, const float thickness, readMesh mesh, const ProblemParameters::HeatTransfer_inp input)
 {
     // Boundary nodes connectivity of elements of surface where radiation heat flow rate is defined 
     // Connectivity of boundary element nodes
@@ -177,10 +177,10 @@ void SurfaceRadiation(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector
         }
         else{
             // Loop over integration points of 1D element
-            for (int j = 0; j < BasisFn1D.NGP; j++)
+            for (int j = 0; j < shapeFunction1D.NGP; j++)
             {
                 // Surface Radiation due to radiant heat flow over boundary
-                R_r += input.ALPHA * input.qs * BasisFn1D.N.row(j) * le/2 * BasisFn1D.WGP[j];
+                R_r += input.ALPHA * input.qs * shapeFunction1D.N.row(j) * le/2 * shapeFunction1D.WGP[j];
             }
         }
 
@@ -195,7 +195,7 @@ void SurfaceRadiation(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector
 
 
 // Heat load vector contribution due to radiant heat flow
-void SurfaceRadiation_HF(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD, readMesh mesh, std::vector<std::vector<unsigned int>> T, SolverInp solverInp, NeumannBC boundary, MaterialThermal matDetails)
+void SurfaceRadiation_HF(ShapeFunction1D shapeFunction1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD, readMesh mesh, std::vector<std::vector<unsigned int>> T, SolverInp solverInp, NeumannBC boundary, MaterialThermal matDetails)
 {
     // Boundary nodes connectivity of elements of surface where radiation heat flow rate is defined 
     // Connectivity of boundary element nodes
@@ -276,10 +276,10 @@ void SurfaceRadiation_HF(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vec
         }
         else{
             // Loop over integration points of 1D element
-            for (int j = 0; j < BasisFn1D.NGP; j++)
+            for (int j = 0; j < shapeFunction1D.NGP; j++)
             {
                 // Surface Radiation due to radiant heat flow over boundary
-                R_r += boundary.Radiation.ALPHA * (boundary.Radiation.qr[0]*normal[0] + boundary.Radiation.qr[1]*normal[1])*le * BasisFn1D.N.row(j) * BasisFn1D.WGP[j] * le/2;
+                R_r += boundary.Radiation.ALPHA * (boundary.Radiation.qr[0]*normal[0] + boundary.Radiation.qr[1]*normal[1])*le * shapeFunction1D.N.row(j) * shapeFunction1D.WGP[j] * le/2;
             }
         }
 
@@ -419,9 +419,9 @@ void SurfaceConduction(Eigen::VectorXd &fGlobal, const std::vector<std::vector<d
             // Number of gauss points
             int ngp;
             if (solverInp.dimension == 2)
-                ngp = meshElement.basisFn1D.NGP;
+                ngp = meshElement.shapeFunction1D.NGP;
             else if (solverInp.dimension == 3){
-                ngp = meshElement.basisFn2D.NGP;
+                ngp = meshElement.shapeFunction2D.NGP;
             }
             // Loop over integration points of 1D element
             for (int j = 0; j < ngp; j++)
@@ -429,13 +429,13 @@ void SurfaceConduction(Eigen::VectorXd &fGlobal, const std::vector<std::vector<d
                 if (solverInp.dimension == 2){
                     // Surface Heating
                     // qs.n * Length of boundary * Shape function * Weights from Gauss Quadratures * det(Jacobian)
-                    Rq += heatFluxNormal * meshElement.basisFn1D.N.row(j) * meshElement.basisFn1D.WGP[j] * material.thickness * le/2;
+                    Rq += heatFluxNormal * meshElement.shapeFunction1D.N.row(j) * meshElement.shapeFunction1D.WGP[j] * material.thickness * le/2;
                 }
                 if (solverInp.dimension == 3){
                     // Surface Heating
                     // qs.n * Length of boundary * Shape function * Weights from Gauss Quadratures * det(Jacobian)
                     double detJ = temp_detJ(Xe);
-                    Rq += heatFluxNormal * meshElement.basisFn2D.N.row(j) * meshElement.basisFn2D.WGP[j] * detJ;
+                    Rq += heatFluxNormal * meshElement.shapeFunction2D.N.row(j) * meshElement.shapeFunction2D.WGP[j] * detJ;
                 }
 
             }
@@ -516,23 +516,23 @@ void SurfaceConvection(Eigen::VectorXd &fGlobal, const std::vector<std::vector<d
             // Number of gauss points
             int ngp;
             if (solverInp.dimension == 2)
-                ngp = meshElement.basisFn1D.NGP;
+                ngp = meshElement.shapeFunction1D.NGP;
             else if (solverInp.dimension == 3){
-                ngp = meshElement.basisFn2D.NGP;
+                ngp = meshElement.shapeFunction2D.NGP;
             }
             // Loop over integration points of 1D element
             for (int j = 0; j < ngp; j++)
             {
                 if (solverInp.dimension == 2){
                     // Surface Convection 
-                    Rh += boundary.H * boundary.ambientTemp * meshElement.basisFn1D.N.row(j) 
-                            * meshElement.basisFn1D.WGP[j] *  material.thickness * le/2;
+                    Rh += boundary.H * boundary.ambientTemp * meshElement.shapeFunction1D.N.row(j) 
+                            * meshElement.shapeFunction1D.WGP[j] *  material.thickness * le/2;
                 }
                 if (solverInp.dimension == 3){
                     // Surface Heating
                     // qs.n * Length of boundary * Shape function * Weights from Gauss Quadratures * det(Jacobian)
                     double detJ = temp_detJ(Xe);
-                    Rh += boundary.H * boundary.ambientTemp * meshElement.basisFn2D.N.row(j) * meshElement.basisFn2D.WGP[j] * detJ;
+                    Rh += boundary.H * boundary.ambientTemp * meshElement.shapeFunction2D.N.row(j) * meshElement.shapeFunction2D.WGP[j] * detJ;
                 }
 
             }
@@ -627,11 +627,11 @@ void StiffnessConvection(std::vector<Eigen::Triplet<double>> &TrList, const std:
 
             // 3D domain means 2D boundary
             if (solverInp.dimension == 3){
-                ngp = meshElement.basisFn2D.NGP;
+                ngp = meshElement.shapeFunction2D.NGP;
             }
             // 2D domain corresponds to 1D boundary
             else if (solverInp.dimension == 2){
-                ngp = meshElement.basisFn1D.NGP;
+                ngp = meshElement.shapeFunction1D.NGP;
             }
 
             // Loop over integration points of 1D element
@@ -639,13 +639,13 @@ void StiffnessConvection(std::vector<Eigen::Triplet<double>> &TrList, const std:
             {
                 // Surface Convection
                 if (solverInp.dimension == 2){
-                    Kh += boundary.H * meshElement.basisFn1D.N.row(j).transpose() * meshElement.basisFn1D.N.row(j) * le / 2.0 
-                            *  material.thickness * meshElement.basisFn1D.WGP[j];
+                    Kh += boundary.H * meshElement.shapeFunction1D.N.row(j).transpose() * meshElement.shapeFunction1D.N.row(j) * le / 2.0 
+                            *  material.thickness * meshElement.shapeFunction1D.WGP[j];
                 }
                 else if (solverInp.dimension == 3){
                     double detJ = temp_detJ(Xe);
-                    Kh += boundary.H * meshElement.basisFn2D.N.row(j).transpose() * 
-                            meshElement.basisFn2D.N.row(j) * meshElement.basisFn2D.WGP[j] * detJ;
+                    Kh += boundary.H * meshElement.shapeFunction2D.N.row(j).transpose() * 
+                            meshElement.shapeFunction2D.N.row(j) * meshElement.shapeFunction2D.WGP[j] * detJ;
                 }
             }
         }

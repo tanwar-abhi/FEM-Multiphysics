@@ -11,19 +11,19 @@ std::vector<std::vector<double>> CentroidPoint(double &r_Bar, double &z_Bar, con
 
 
 // Calculates the Jacobian matrix and derivative of shape Function W.R.T x and y at current Gauss Point
-Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen::MatrixXd &Xe, const ShapeFn2D &BasisFn, const int itr)
+Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen::MatrixXd &Xe, const ShapeFunction2D &shapeFunction, const int itr)
 {
     // Jacobian Matrix
     Eigen::Matrix2d J;
     J.setZero();
 
-    J.row(0) << BasisFn.Nxi.row(itr) * Xe.col(0) , BasisFn.Nxi.row(itr) * Xe.col(1);
-    J.row(1) << BasisFn.Neta.row(itr) * Xe.col(0) , BasisFn.Neta.row(itr) * Xe.col(1);
+    J.row(0) << shapeFunction.Nxi.row(itr) * Xe.col(0) , shapeFunction.Nxi.row(itr) * Xe.col(1);
+    J.row(1) << shapeFunction.Neta.row(itr) * Xe.col(0) , shapeFunction.Neta.row(itr) * Xe.col(1);
 
     // Matrix containing derivate of N w.r.t Natural coordinates (i.e. xi and eta)
-    Eigen::MatrixXd NNatural(2, BasisFn.Nxi.cols());
-    NNatural.row(0) << BasisFn.Nxi.row(itr);
-    NNatural.row(1) << BasisFn.Neta.row(itr);
+    Eigen::MatrixXd NNatural(2, shapeFunction.Nxi.cols());
+    NNatural.row(0) << shapeFunction.Nxi.row(itr);
+    NNatural.row(1) << shapeFunction.Neta.row(itr);
 
     // Calculate derivative of Shape function w.r.t global coodinates (i.e. x, y)
     Eigen::MatrixXd result = J.completeOrthogonalDecomposition().solve(NNatural);
@@ -38,21 +38,21 @@ Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen
 
 
 // Calculates the Jacobian matrix and derivative of shape Function of 3D element W.R.T x,y and z at current Gauss Point
-Eigen::Matrix3d Jacobian3D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, Eigen::VectorXd &Nz, const Eigen::MatrixXd &Xe, const ShapeFn3D &shapeFn, const int itr)
+Eigen::Matrix3d Jacobian3D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, Eigen::VectorXd &Nz, const Eigen::MatrixXd &Xe, const ShapeFunction3D &shapeFunction, const int itr)
 {
     // Jacobian Matrix
     Eigen::Matrix3d J;
     J.setZero();
 
-    J.row(0) << shapeFn.Nxi.row(itr) * Xe.col(0), shapeFn.Nxi.row(itr) * Xe.col(1), shapeFn.Nxi.row(itr) * Xe.col(2);
-    J.row(1) << shapeFn.Neta.row(itr) * Xe.col(0), shapeFn.Neta.row(itr) * Xe.col(1), shapeFn.Neta.row(itr) * Xe.col(2);
-    J.row(2) << shapeFn.Nzeta.row(itr) * Xe.col(0), shapeFn.Nzeta.row(itr) * Xe.col(1), shapeFn.Nzeta.row(itr) * Xe.col(2);
+    J.row(0) << shapeFunction.Nxi.row(itr) * Xe.col(0), shapeFunction.Nxi.row(itr) * Xe.col(1), shapeFunction.Nxi.row(itr) * Xe.col(2);
+    J.row(1) << shapeFunction.Neta.row(itr) * Xe.col(0), shapeFunction.Neta.row(itr) * Xe.col(1), shapeFunction.Neta.row(itr) * Xe.col(2);
+    J.row(2) << shapeFunction.Nzeta.row(itr) * Xe.col(0), shapeFunction.Nzeta.row(itr) * Xe.col(1), shapeFunction.Nzeta.row(itr) * Xe.col(2);
 
     // Matrix containing derivate of N w.r.t Natural coordinates (i.e. Xi, Eta, Zeta)
-    Eigen::MatrixXd NNatural(3, shapeFn.Nxi.cols());
-    NNatural.row(0) << shapeFn.Nxi.row(itr);
-    NNatural.row(1) << shapeFn.Neta.row(itr);
-    NNatural.row(2) << shapeFn.Nzeta.row(itr);
+    Eigen::MatrixXd NNatural(3, shapeFunction.Nxi.cols());
+    NNatural.row(0) << shapeFunction.Nxi.row(itr);
+    NNatural.row(1) << shapeFunction.Neta.row(itr);
+    NNatural.row(2) << shapeFunction.Nzeta.row(itr);
 
     // Calculate derivative of Shape function w.r.t global coodinates (i.e. x, y)
     Eigen::MatrixXd result = J.completeOrthogonalDecomposition().solve(NNatural);
@@ -248,10 +248,10 @@ void ElementMatrixHT(Eigen::MatrixXd &Klocal, Eigen::MatrixXd &Clocal, Eigen::Ve
         // Number of gauss points
         int ngp;
         if (solverInp.dimension == 2){
-            ngp = meshElement.basisFn2D.NGP;
+            ngp = meshElement.shapeFunction2D.NGP;
         }
         else if (solverInp.dimension == 3){
-            ngp = meshElement.basisFn3D.NGP;
+            ngp = meshElement.shapeFunction3D.NGP;
         }
 
         // Loop over gauss points (integration points)
@@ -264,10 +264,10 @@ void ElementMatrixHT(Eigen::MatrixXd &Klocal, Eigen::MatrixXd &Clocal, Eigen::Ve
 
             // Calculate element Jacobian to convert from natural (isoparametric) to global (Cartesian) coordinates.
             if (solverInp.dimension == 2){
-                Jacobian = Jacobian2D(Nx, Ny, Xe, meshElement.basisFn2D, i);
+                Jacobian = Jacobian2D(Nx, Ny, Xe, meshElement.shapeFunction2D, i);
             }
             else if (solverInp.dimension == 3){
-                Jacobian = Jacobian3D(Nx, Ny, Nz, Xe, meshElement.basisFn3D, i);
+                Jacobian = Jacobian3D(Nx, Ny, Nz, Xe, meshElement.shapeFunction3D, i);
             }
 
 
@@ -329,9 +329,9 @@ void ElementMatrixHT(Eigen::MatrixXd &Klocal, Eigen::MatrixXd &Clocal, Eigen::Ve
                 if (solverInp.massMatrixType)
                 {
                     if (solverInp.dimension == 2)
-                        Clocal += material.RHO * material.spHeat * meshElement.basisFn2D.N.row(i).transpose() * meshElement.basisFn2D.N.row(i) * material.thickness * meshElement.basisFn2D.WGP[i] * detJ;
+                        Clocal += material.RHO * material.spHeat * meshElement.shapeFunction2D.N.row(i).transpose() * meshElement.shapeFunction2D.N.row(i) * material.thickness * meshElement.shapeFunction2D.WGP[i] * detJ;
                     else if (solverInp.dimension == 3){
-                        Clocal += material.RHO * material.spHeat * meshElement.basisFn3D.N.row(i).transpose() * meshElement.basisFn3D.N.row(i) * material.thickness * meshElement.basisFn3D.WGP[i] * detJ;
+                        Clocal += material.RHO * material.spHeat * meshElement.shapeFunction3D.N.row(i).transpose() * meshElement.shapeFunction3D.N.row(i) * material.thickness * meshElement.shapeFunction3D.WGP[i] * detJ;
                     }
                 }
                 // Lumped Capacitance Matrix Selected
@@ -344,9 +344,9 @@ void ElementMatrixHT(Eigen::MatrixXd &Klocal, Eigen::MatrixXd &Clocal, Eigen::Ve
             // Thermal conductivity tensor for isotropic/anisotropic material
             Eigen::MatrixXd K_Tensor = Material_HT(B.rows(), material.k);
             if (solverInp.dimension == 2)
-                Klocal += B.transpose() * K_Tensor * B * material.thickness * meshElement.basisFn2D.WGP[i] * detJ;
+                Klocal += B.transpose() * K_Tensor * B * material.thickness * meshElement.shapeFunction2D.WGP[i] * detJ;
             else if (solverInp.dimension == 3){
-                Klocal += B.transpose() * K_Tensor * B * meshElement.basisFn3D.WGP[i] * detJ;
+                Klocal += B.transpose() * K_Tensor * B * meshElement.shapeFunction3D.WGP[i] * detJ;
             }
 
 
@@ -357,9 +357,9 @@ void ElementMatrixHT(Eigen::MatrixXd &Klocal, Eigen::MatrixXd &Clocal, Eigen::Ve
                 {
                     // Internal heat generation contribution. (Rq)
                     if (solverInp.dimension == 2)
-                        flocal += boundary.neumann[indexHS].Q * meshElement.basisFn2D.N.row(i) * material.thickness * meshElement.basisFn2D.WGP[i] * detJ;
+                        flocal += boundary.neumann[indexHS].Q * meshElement.shapeFunction2D.N.row(i) * material.thickness * meshElement.shapeFunction2D.WGP[i] * detJ;
                     else if (solverInp.dimension == 3){
-                        flocal += boundary.neumann[indexHS].Q * meshElement.basisFn3D.N.row(i) * meshElement.basisFn3D.WGP[i] * detJ;
+                        flocal += boundary.neumann[indexHS].Q * meshElement.shapeFunction3D.N.row(i) * meshElement.shapeFunction3D.WGP[i] * detJ;
                     }
                 }
             }
@@ -501,13 +501,13 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
         // Initialize variables as per 3D problem
         if (solverInp.dimension == 3)
         {
-            numGaussPts = meshElement.basisFn3D.NGP;
+            numGaussPts = meshElement.shapeFunction3D.NGP;
             Jacobian = Eigen::MatrixXd::Zero(3,3);
         }
         // Initialize variables as per 2D problem
         else if (solverInp.dimension == 2)
         {
-            numGaussPts = meshElement.basisFn2D.NGP;
+            numGaussPts = meshElement.shapeFunction2D.NGP;
             Jacobian = Eigen::MatrixXd::Zero(2,2);
         }
 
@@ -522,9 +522,9 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
 
             // Calculate element Jacobian used to convert from natural (isoparametric) to global (Cartesian) coordinates.
             if (solverInp.dimension == 2)
-                Jacobian = Jacobian2D(Nx, Ny, Xe, meshElement.basisFn2D, i);
+                Jacobian = Jacobian2D(Nx, Ny, Xe, meshElement.shapeFunction2D, i);
             else if (solverInp.dimension == 3){
-                Jacobian = Jacobian3D(Nx, Ny, Nz, Xe, meshElement.basisFn3D, i);
+                Jacobian = Jacobian3D(Nx, Ny, Nz, Xe, meshElement.shapeFunction3D, i);
             }
 
 
@@ -541,8 +541,8 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 6);
-                Nmat.row(0) << meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0;
-                Nmat.row(1) << 0, meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2);
+                Nmat.row(0) << meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0;
+                Nmat.row(1) << 0, meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2);
             }
             // 4 node, linear quadrilateral element {2D}
             else if (meshElement.elemType == 3)
@@ -553,8 +553,8 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 8);
-                Nmat.row(0) << meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3), 0;
-                Nmat.row(1) << 0, meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3);
+                Nmat.row(0) << meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3), 0;
+                Nmat.row(1) << 0, meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3);
 
             }
             // 6 node, second order triangle element {2D}
@@ -566,8 +566,8 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3), Ny(4), Nx(4), Ny(5), Nx(5);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 12);
-                Nmat.row(0) << meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3), 0, meshElement.basisFn2D.N(i,4), 0, meshElement.basisFn2D.N(i,5), 0;
-                Nmat.row(1) << 0, meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3), 0, meshElement.basisFn2D.N(i,4), 0, meshElement.basisFn2D.N(i,5);
+                Nmat.row(0) << meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3), 0, meshElement.shapeFunction2D.N(i,4), 0, meshElement.shapeFunction2D.N(i,5), 0;
+                Nmat.row(1) << 0, meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3), 0, meshElement.shapeFunction2D.N(i,4), 0, meshElement.shapeFunction2D.N(i,5);
             }
             // Quadrilateral element, 2nd order {9 noded, quadratic interpolation} (2D)
             else if (meshElement.elemType == 10)
@@ -578,8 +578,8 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                 B.row(2) << Ny(0), Nx(0), Ny(1), Nx(1), Ny(2), Nx(2), Ny(3), Nx(3), Ny(4), Nx(4), Ny(5), Nx(5), Ny(6), Nx(6), Ny(7), Nx(7), Ny(8), Nx(8);
 
                 Nmat = Eigen::MatrixXd::Zero(2, 18);
-                Nmat.row(0) << meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3), 0, meshElement.basisFn2D.N(i,4), 0, meshElement.basisFn2D.N(i,5), 0, meshElement.basisFn2D.N(i,6), 0, meshElement.basisFn2D.N(i,7), 0, meshElement.basisFn2D.N(i,8), 0;
-                Nmat.row(1) << 0, meshElement.basisFn2D.N(i,0), 0, meshElement.basisFn2D.N(i,1), 0, meshElement.basisFn2D.N(i,2), 0, meshElement.basisFn2D.N(i,3), 0, meshElement.basisFn2D.N(i,4), 0, meshElement.basisFn2D.N(i,5), 0, meshElement.basisFn2D.N(i,6), 0, meshElement.basisFn2D.N(i,7), 0, meshElement.basisFn2D.N(i,8);
+                Nmat.row(0) << meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3), 0, meshElement.shapeFunction2D.N(i,4), 0, meshElement.shapeFunction2D.N(i,5), 0, meshElement.shapeFunction2D.N(i,6), 0, meshElement.shapeFunction2D.N(i,7), 0, meshElement.shapeFunction2D.N(i,8), 0;
+                Nmat.row(1) << 0, meshElement.shapeFunction2D.N(i,0), 0, meshElement.shapeFunction2D.N(i,1), 0, meshElement.shapeFunction2D.N(i,2), 0, meshElement.shapeFunction2D.N(i,3), 0, meshElement.shapeFunction2D.N(i,4), 0, meshElement.shapeFunction2D.N(i,5), 0, meshElement.shapeFunction2D.N(i,6), 0, meshElement.shapeFunction2D.N(i,7), 0, meshElement.shapeFunction2D.N(i,8);
             }
             // 8 Noded Hexahedral Linear element {3D}
             else if (meshElement.elemType == 5)
@@ -593,9 +593,9 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                 B.row(5) << Nz(0), 0, Nx(0), Nz(1), 0, Nx(1), Nz(2), 0, Nx(2), Nz(3), 0, Nx(3), Nz(4), 0, Nx(4), Nz(5), 0, Nx(5), Nz(6), 0, Nx(6), Nz(7), 0, Nx(7);
 
                 Nmat = Eigen::MatrixXd::Zero(3, 24);
-                Nmat.row(0) << meshElement.basisFn3D.N(i,0), 0, 0, meshElement.basisFn3D.N(i,1), 0, 0, meshElement.basisFn3D.N(i,2), 0, 0, meshElement.basisFn3D.N(i,3), 0, 0, meshElement.basisFn3D.N(i,4), 0, 0, meshElement.basisFn3D.N(i,5), 0, 0, meshElement.basisFn3D.N(i,6), 0, 0, meshElement.basisFn3D.N(i,7), 0, 0;
-                Nmat.row(1) << 0, meshElement.basisFn3D.N(i,0), 0, 0, meshElement.basisFn3D.N(i,1), 0, 0, meshElement.basisFn3D.N(i,2), 0, 0, meshElement.basisFn3D.N(i,3), 0, 0, meshElement.basisFn3D.N(i,4), 0, 0, meshElement.basisFn3D.N(i,5), 0, 0, meshElement.basisFn3D.N(i,6), 0, 0, meshElement.basisFn3D.N(i,7), 0;
-                Nmat.row(2) << 0, 0, meshElement.basisFn3D.N(i,0), 0, 0, meshElement.basisFn3D.N(i,1), 0, 0, meshElement.basisFn3D.N(i,2), 0, 0, meshElement.basisFn3D.N(i,3), 0, 0, meshElement.basisFn3D.N(i,4), 0, 0, meshElement.basisFn3D.N(i,5), 0, 0, meshElement.basisFn3D.N(i,6), 0, 0, meshElement.basisFn3D.N(i,7);
+                Nmat.row(0) << meshElement.shapeFunction3D.N(i,0), 0, 0, meshElement.shapeFunction3D.N(i,1), 0, 0, meshElement.shapeFunction3D.N(i,2), 0, 0, meshElement.shapeFunction3D.N(i,3), 0, 0, meshElement.shapeFunction3D.N(i,4), 0, 0, meshElement.shapeFunction3D.N(i,5), 0, 0, meshElement.shapeFunction3D.N(i,6), 0, 0, meshElement.shapeFunction3D.N(i,7), 0, 0;
+                Nmat.row(1) << 0, meshElement.shapeFunction3D.N(i,0), 0, 0, meshElement.shapeFunction3D.N(i,1), 0, 0, meshElement.shapeFunction3D.N(i,2), 0, 0, meshElement.shapeFunction3D.N(i,3), 0, 0, meshElement.shapeFunction3D.N(i,4), 0, 0, meshElement.shapeFunction3D.N(i,5), 0, 0, meshElement.shapeFunction3D.N(i,6), 0, 0, meshElement.shapeFunction3D.N(i,7), 0;
+                Nmat.row(2) << 0, 0, meshElement.shapeFunction3D.N(i,0), 0, 0, meshElement.shapeFunction3D.N(i,1), 0, 0, meshElement.shapeFunction3D.N(i,2), 0, 0, meshElement.shapeFunction3D.N(i,3), 0, 0, meshElement.shapeFunction3D.N(i,4), 0, 0, meshElement.shapeFunction3D.N(i,5), 0, 0, meshElement.shapeFunction3D.N(i,6), 0, 0, meshElement.shapeFunction3D.N(i,7);
             }
             else{
                 std::cerr<<"Element Selection Error : Element Type not available in Solver\n";
@@ -609,11 +609,11 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
 
             if (solverInp.dimension == 2){
                 // Calculate Local element stiffness matrix at each gauss point for 2D element
-                K_local += (B.transpose() * Dmat * B) * material.thickness * meshElement.basisFn2D.WGP[i] * detJ;
+                K_local += (B.transpose() * Dmat * B) * material.thickness * meshElement.shapeFunction2D.WGP[i] * detJ;
             }
             else if (solverInp.dimension == 3){
                 // Calculate Local element stiffness matrix at each gauss point for 3D element
-                K_local += (B.transpose() * Dmat * B) * meshElement.basisFn3D.WGP[i] * detJ;
+                K_local += (B.transpose() * Dmat * B) * meshElement.shapeFunction3D.WGP[i] * detJ;
             }
 
             // Vector of body forces {if defined }
@@ -627,7 +627,7 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                     elementBodyForce << boundary.dirichlet[bodyForceIndex].values[0], boundary.dirichlet[bodyForceIndex].values[1];
 
                     // Calculate element force vector (local) for 2D elements
-                    f_local += material.thickness * Nmat.transpose() * elementBodyForce * meshElement.basisFn2D.WGP[i] * detJ;
+                    f_local += material.thickness * Nmat.transpose() * elementBodyForce * meshElement.shapeFunction2D.WGP[i] * detJ;
                 }
                 else if (solverInp.dimension == 3){
                     elementBodyForce = Eigen::VectorXd::Zero(3);
@@ -635,7 +635,7 @@ void ElementMatrixLE(Eigen::MatrixXd &K_local, Eigen::VectorXd &f_local, const E
                                         boundary.dirichlet[bodyForceIndex].values[2];
 
                     // Calculate element force vector (local) for 3D elements
-                    f_local += Nmat.transpose() * elementBodyForce * meshElement.basisFn3D.WGP[i] * detJ;
+                    f_local += Nmat.transpose() * elementBodyForce * meshElement.shapeFunction3D.WGP[i] * detJ;
                 }
             }
         }

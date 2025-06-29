@@ -2,20 +2,20 @@
 #include <cmath>
 #include "quadratures.hpp"
 
-Quad1D::Quad1D()
+Quadrature1D::Quadrature1D()
 {
     // Default Constructor
 }
 
-Quad1D::~Quad1D(){
+Quadrature1D::~Quadrature1D(){
     // Default destructor
 }
 
 // Get Gauss Points and weights for 1D element; ngaus -> No. of gauss points
-std::vector<Quad1D> Quad1D::GaussQuad(const int NGAUS)
+std::vector<Quadrature1D> Quadrature1D::GaussQuadrature(const int NGAUS)
 {
-    // Initializing vector of quadratures
-    std::vector<Quad1D> GPoints(NGAUS);
+    // Initializing vector of Quadratureratures
+    std::vector<Quadrature1D> GPoints(NGAUS);
 
     switch (NGAUS)
     {
@@ -328,27 +328,27 @@ std::vector<Quad1D> Quad1D::GaussQuad(const int NGAUS)
 }
 
 
-Quad2d::Quad2d(){
+Quadrature2D::Quadrature2D(){
     // Default Constructor
 }
 
 
-Quad2d::~Quad2d(){
+Quadrature2D::~Quadrature2D(){
     // Default Destructor
 }
 
 // Gauss Points for 2D 
-std::vector<Quad2d> Quad2d::GaussQuad(const int NGP, int eType)
+std::vector<Quadrature2D> Quadrature2D::GaussQuadrature(const int NGP, int eType)
 {
-    std::vector<Quad2d> GPoints2D(NGP);
+    std::vector<Quadrature2D> GPoints2D(NGP);
     // Quadrilateral element
     if (eType == 3 || eType == 10)
     {
         int ng = ceil(sqrt(NGP));
 
         // Element to get 1D gauss quadratures used to calculate Quadrilateral Gauss points.
-        Quad1D GQ1D;
-        std::vector<Quad1D> GPVector = GQ1D.GaussQuad(ng);
+        Quadrature1D GQ1D;
+        std::vector<Quadrature1D> GPVector = GQ1D.GaussQuadrature(ng);
         // Counters for index of gauss points
         int ct = 0;
 
@@ -553,17 +553,17 @@ std::vector<Quad2d> Quad2d::GaussQuad(const int NGP, int eType)
 
 
 
-Quad3D::Quad3D(){
-    // Default constructor for 3D gauss quadratures
+Quadrature3D::Quadrature3D(){
+    // Default constructor for 3D gauss Quadrature
 }
 
-Quad3D::~Quad3D(){
+Quadrature3D::~Quadrature3D(){
     // Default destructor of 3D gauss quadratures
 }
 
-std::vector<Quad3D> Quad3D::GaussQuad(const int NGP, int elementType)
+std::vector<Quadrature3D> Quadrature3D::GaussQuadrature(const int NGP, int elementType)
 {
-    std::vector<Quad3D> gaussPoints(NGP);
+    std::vector<Quadrature3D> gaussPoints(NGP);
 
     // Hexahedral element {Linear 8node} :: QUadratic TODO
     if (elementType == 5)

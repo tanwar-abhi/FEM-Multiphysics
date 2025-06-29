@@ -40,7 +40,7 @@ void assembleMatrixLE(std::vector<Tr> &tripletStiffness, Eigen::VectorXd &f_glob
     BasisFn = Object of shapeFn containing all shape functions and it's derivatives in natural coordinate(w.r.t xi,eta)
     i = iterator of the current loop of gauss point
 */
-Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen::MatrixXd &Element_NC, const ShapeFn2D &BasisFn, const int i);
+Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen::MatrixXd &Element_NC, const ShapeFunction2D &BasisFn, const int i);
 
 
 
@@ -53,7 +53,7 @@ Eigen::Matrix2d Jacobian2D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, const Eigen
     shapeFn = objecto of 3D shapefunction for the respective element
     i = iterator of the current looop of gauss point
 */
-Eigen::Matrix3d Jacobian3D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, Eigen::VectorXd &Nz, const Eigen::MatrixXd &Xe, const ShapeFn3D &shapeFn, const int itr);
+Eigen::Matrix3d Jacobian3D(Eigen::VectorXd &Nx, Eigen::VectorXd &Ny, Eigen::VectorXd &Nz, const Eigen::MatrixXd &Xe, const ShapeFunction3D &shapeFn, const int itr);
 
 
 

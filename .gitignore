@@ -45,6 +45,7 @@ build/*
 .vscode/*
 inputs/*
 results/*
+documentation/*
 
 
 # Exclude json input files and results files

@@ -229,8 +229,8 @@ Eigen::MatrixXd Stress_PostProcess(const Eigen::VectorXd &Displacements, std::ve
 {
     Eigen::MatrixXd Stress;
 
-    ShapeFn2D shapeFunction2D;
-    shapeFunction2D.getShapeFn(mesh.elemType);
+    ShapeFunction2D shapeFunction2D;
+    shapeFunction2D.getShapeFunction(mesh.elemType);
 
     // Jacobian Matrix
     Eigen::Matrix2d Jacobian;

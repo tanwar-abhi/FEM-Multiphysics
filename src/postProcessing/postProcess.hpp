@@ -42,7 +42,7 @@ void ExportTXT(const Eigen::VectorXd &variable,std::string fileName, std::string
 
 // Overload function to export coordinates and connectivity data from code to csv file
 template<typename T>
-void ExportCSV(std::vector<std::vector<T>> variable, std::string fileName)
+void ExportCSV(const std::vector<std::vector<T>> &variable, std::string fileName)
 {
     std::ofstream file;
     file.open(fileName);

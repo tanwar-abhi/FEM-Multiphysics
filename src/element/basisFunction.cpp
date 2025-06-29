@@ -37,9 +37,9 @@ ShapeFunction3D::~ShapeFunction3D()
 std::vector<Eigen::MatrixXd> BasisFunction::shapeFunction_1D(int const ngp)
 {
     // Element initialized for 1d Gauss Quadratures
-    Quad1D GQelement;
-    std::vector<Quad1D> GQ;
-    GQ = GQelement.GaussQuad(ngp);
+    Quadrature1D GQelement;
+    std::vector<Quadrature1D> GQ;
+    GQ = GQelement.GaussQuadrature(ngp);
 
     std::vector<Eigen::MatrixXd> result;
 
@@ -114,8 +114,8 @@ std::vector<Eigen::MatrixXd> BasisFunction::shapeFunction_1D(int const ngp)
 
 std::vector<Eigen::MatrixXd> BasisFunction::shapeFunction_2D(const int NGP)
 {
-    Quad2d GQelement;
-    std::vector<Quad2d> GQ = GQelement.GaussQuad(NGP, Etype);
+    Quadrature2D quadrature2D;
+    std::vector<Quadrature2D> GQ = quadrature2D.GaussQuadrature(NGP, Etype);
 
     // Vector containing all values of shape functions
     std::vector<Eigen::MatrixXd> result;
@@ -470,10 +470,10 @@ void ShapeFunction3D::getShapeFunction(int elemType, int ngp)
     this->NGP = ngp;
     eType = elemType;
 
-    Quad3D gaussQuadElement;
-    std::vector<Quad3D> GQ;
+    Quadrature3D gaussQuadratureElement;
+    std::vector<Quadrature3D> GQ;
 
-    GQ = gaussQuadElement.GaussQuad(ngp, elemType);
+    GQ = gaussQuadratureElement.GaussQuadrature(ngp, elemType);
 
     switch (elemType)
     {

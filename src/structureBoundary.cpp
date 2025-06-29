@@ -28,7 +28,7 @@ void initializeBForce(Eigen::VectorXd &BForce, Parameters_LE inputs)
 
 
 /* Imposing neuman boundary forces term in global force vector
-void imposeTraction(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD,std::vector<std::vector<unsigned int>> T, readMesh mesh, SolverInp solverInpObj, BoundaryConditions boundaryTraction)
+void imposeTraction(ShapeFn1D shapeFunction1D, Eigen::VectorXd &fGlobal, std::vector<std::vector<double>> NODE_COORD,std::vector<std::vector<unsigned int>> T, readMesh mesh, SolverInp solverInpObj, BoundaryConditions boundaryTraction)
 {
 
     // Length of the Neuman Boundary Edge (for calculating tractions)
@@ -125,22 +125,22 @@ void imposeTraction(ShapeFn1D BasisFn1D, Eigen::VectorXd &fGlobal, std::vector<s
         }
         else{
             // Loop over integration points of 1D element
-            for (int j = 0; j < BasisFn1D.NGP; j++)
+            for (int j = 0; j < shapeFunction1D.NGP; j++)
             {
                 Eigen::MatrixXd Nmat(2, nen*2);
                 Nmat.setZero();
                 if (nen == 2){
-                    Nmat.row(0) << BasisFn1D.N(j,0), 0, BasisFn1D.N(j,1), 0;
-                    Nmat.row(1) << 0, BasisFn1D.N(j,0), 0, BasisFn1D.N(j,1);
+                    Nmat.row(0) << shapeFunction1D.N(j,0), 0, shapeFunction1D.N(j,1), 0;
+                    Nmat.row(1) << 0, shapeFunction1D.N(j,0), 0, shapeFunction1D.N(j,1);
                 }
                 else if(nen == 3){
-                    Nmat.row(0) << BasisFn1D.N(j,0), 0, BasisFn1D.N(j,1), 0, BasisFn1D.N(j,2), 0;
-                    Nmat.row(1) << 0, BasisFn1D.N(j,0), 0, BasisFn1D.N(j,1), 0, BasisFn1D.N(j,2);
+                    Nmat.row(0) << shapeFunction1D.N(j,0), 0, shapeFunction1D.N(j,1), 0, shapeFunction1D.N(j,2), 0;
+                    Nmat.row(1) << 0, shapeFunction1D.N(j,0), 0, shapeFunction1D.N(j,1), 0, shapeFunction1D.N(j,2);
                 }
 
                 // Boundary element traction force calculation.
-                fe_tr += input.thickness * (Nmat.transpose() * (trF/LEdge) * BasisFn1D.WGP[j] * le/2);
-                // fe_tr += input.thickness * (Nmat.transpose() * (trF/le) * BasisFn1D.WGP[j] * le/2);
+                fe_tr += input.thickness * (Nmat.transpose() * (trF/LEdge) * shapeFunction1D.WGP[j] * le/2);
+                // fe_tr += input.thickness * (Nmat.transpose() * (trF/le) * shapeFunction1D.WGP[j] * le/2);
             }
         }
 
@@ -304,9 +304,9 @@ void imposeTraction(Eigen::VectorXd &fGlobal, const Element &meshElement, const 
             // Number of gauss points
             int ngp;
             if (solverInpObj.dimension == 2)
-                ngp = meshElement.basisFn1D.NGP;
+                ngp = meshElement.shapeFunction1D.NGP;
             else if (solverInpObj.dimension == 3){
-                ngp = meshElement.basisFn2D.NGP;
+                ngp = meshElement.shapeFunction2D.NGP;
             }
 
             Eigen::MatrixXd Jacobian(2,2); Jacobian.setZero();
@@ -328,57 +328,57 @@ void imposeTraction(Eigen::VectorXd &fGlobal, const Element &meshElement, const 
                 // 2Node line element (1D) on boundary
                 if (meshElement.elemType == 1)
                 {
-                    Nmat.row(0) << meshElement.basisFn1D.N(j,0), 0, meshElement.basisFn1D.N(j,1), 0;
-                    Nmat.row(1) << 0, meshElement.basisFn1D.N(j,0), 0, meshElement.basisFn1D.N(j,1);
+                    Nmat.row(0) << meshElement.shapeFunction1D.N(j,0), 0, meshElement.shapeFunction1D.N(j,1), 0;
+                    Nmat.row(1) << 0, meshElement.shapeFunction1D.N(j,0), 0, meshElement.shapeFunction1D.N(j,1);
                 }
                 // 3-node second order line (1D) on boundary
                 else if (meshElement.elemType == 8 )
                 {
-                    Nmat.row(0) << meshElement.basisFn1D.N(j,0), 0, meshElement.basisFn1D.N(j,1), 0, meshElement.basisFn1D.N(j,2), 0;
-                    Nmat.row(1) << 0, meshElement.basisFn1D.N(j,0), 0, meshElement.basisFn1D.N(j,1), 0, meshElement.basisFn1D.N(j,2);
+                    Nmat.row(0) << meshElement.shapeFunction1D.N(j,0), 0, meshElement.shapeFunction1D.N(j,1), 0, meshElement.shapeFunction1D.N(j,2), 0;
+                    Nmat.row(1) << 0, meshElement.shapeFunction1D.N(j,0), 0, meshElement.shapeFunction1D.N(j,1), 0, meshElement.shapeFunction1D.N(j,2);
                 }
                 // 3-node triangle (2D) on boundary
                 else if (meshElement.elemType == 2)
                 {
-                    // Nmat.row(0) << meshElement.basisFn2D.N(j,0), 0, meshElement.basisFn2D.N(j,1), 0, meshElement.basisFn2D.N(j,2), 0;
-                    // Nmat.row(1) << 0, meshElement.basisFn2D.N(j,0), 0, meshElement.basisFn2D.N(j,1), 0, meshElement.basisFn2D.N(j,2);
+                    // Nmat.row(0) << meshElement.shapeFunction2D.N(j,0), 0, meshElement.shapeFunction2D.N(j,1), 0, meshElement.shapeFunction2D.N(j,2), 0;
+                    // Nmat.row(1) << 0, meshElement.shapeFunction2D.N(j,0), 0, meshElement.shapeFunction2D.N(j,1), 0, meshElement.shapeFunction2D.N(j,2);
 
-                    Nmat.row(0) << meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2), 0, 0;
-                    Nmat.row(1) << 0, meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2), 0;
-                    Nmat.row(2) << 0, 0, meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2);
+                    Nmat.row(0) << meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2), 0, 0;
+                    Nmat.row(1) << 0, meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2), 0;
+                    Nmat.row(2) << 0, 0, meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2);
                 }
                 // 4-node rectangle (2D) on boundary
                 else if (meshElement.elemType == 3){
-                    // Nmat.row(0) << meshElement.basisFn2D.N(j,0), 0, meshElement.basisFn2D.N(j,1), 0, meshElement.basisFn2D.N(j,2), 0, meshElement.basisFn2D.N(j,3), 0;
-                    // Nmat.row(1) << 0, meshElement.basisFn2D.N(j,0), 0, meshElement.basisFn2D.N(j,1), 0, meshElement.basisFn2D.N(j,2), 0, meshElement.basisFn2D.N(j,3);
+                    // Nmat.row(0) << meshElement.shapeFunction2D.N(j,0), 0, meshElement.shapeFunction2D.N(j,1), 0, meshElement.shapeFunction2D.N(j,2), 0, meshElement.shapeFunction2D.N(j,3), 0;
+                    // Nmat.row(1) << 0, meshElement.shapeFunction2D.N(j,0), 0, meshElement.shapeFunction2D.N(j,1), 0, meshElement.shapeFunction2D.N(j,2), 0, meshElement.shapeFunction2D.N(j,3);
 
-                    Nmat.row(0) << meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2), 0, 0, meshElement.basisFn2D.N(j,3), 0, 0;
-                    Nmat.row(1) << 0, meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2), 0, 0, meshElement.basisFn2D.N(j,3), 0;
-                    Nmat.row(2) << 0, 0, meshElement.basisFn2D.N(j,0), 0, 0, meshElement.basisFn2D.N(j,1), 0, 0, meshElement.basisFn2D.N(j,2), 0, 0, meshElement.basisFn2D.N(j,3);
+                    Nmat.row(0) << meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2), 0, 0, meshElement.shapeFunction2D.N(j,3), 0, 0;
+                    Nmat.row(1) << 0, meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2), 0, 0, meshElement.shapeFunction2D.N(j,3), 0;
+                    Nmat.row(2) << 0, 0, meshElement.shapeFunction2D.N(j,0), 0, 0, meshElement.shapeFunction2D.N(j,1), 0, 0, meshElement.shapeFunction2D.N(j,2), 0, 0, meshElement.shapeFunction2D.N(j,3);
                 }
                 // Boundary element traction force calculation.
                 if (solverInpObj.dimension == 2){
                     if (boundary.variable == "TRACTION" || boundary.variable == "PRESSURE")
-                        fe_tr += material.thickness * (Nmat.transpose() * trF * meshElement.basisFn1D.WGP[j] * le / 2);
+                        fe_tr += material.thickness * (Nmat.transpose() * trF * meshElement.shapeFunction1D.WGP[j] * le / 2);
                     else if (boundary.variable == "FORCE")
-                        fe_tr += material.thickness * (Nmat.transpose() * (trF / surfaceArea) * meshElement.basisFn1D.WGP[j] * le / 2);
+                        fe_tr += material.thickness * (Nmat.transpose() * (trF / surfaceArea) * meshElement.shapeFunction1D.WGP[j] * le / 2);
                 }
                 else if (solverInpObj.dimension == 3){
                     // Derivative of shape functions (N) w.r.t global axis i.e.. X,Y,Z
                     Eigen::VectorXd Nx(ngp);
                     Eigen::VectorXd Ny(ngp);
 
-                    //Jacobian = Jacobian2D2(Nx, Ny, Xe, meshElement.basisFn2D, j);
+                    //Jacobian = Jacobian2D2(Nx, Ny, Xe, meshElement.shapeFunction2D, j);
 
                     //double detJ = Jacobian.determinant();
                     //detJ = abs(detJ);
                     // Temporary method for determinant. Need to verify for imperfect quadrilateral 
                     double detJ = temp_detJ(Xe);
-                    // fe_tr += (Nmat.transpose() * (trF/le) * BasisFn1D.WGP[j] * le/2);
+                    // fe_tr += (Nmat.transpose() * (trF/le) * shapeFunction1D.WGP[j] * le/2);
                     if (boundary.variable == "TRACTION" || boundary.variable == "PRESSURE")
-                        fe_tr += (Nmat.transpose() * trF * meshElement.basisFn2D.WGP[j] * detJ);
+                        fe_tr += (Nmat.transpose() * trF * meshElement.shapeFunction2D.WGP[j] * detJ);
                     else if (boundary.variable == "FORCE"){
-                        fe_tr += (Nmat.transpose() * (trF / surfaceArea) * meshElement.basisFn2D.WGP[j] * detJ);
+                        fe_tr += (Nmat.transpose() * (trF / surfaceArea) * meshElement.shapeFunction2D.WGP[j] * detJ);
                     }
                 }
             }
