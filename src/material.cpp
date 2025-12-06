@@ -191,7 +191,7 @@ std::vector<MaterialThermal> MaterialThermal::readMaterialInputs()
     // Vector containing multiple material definations
     std::vector<MaterialThermal> MaterialThermal_collection;
 
-    std::ifstream mat_text("solver.json");
+    std::ifstream mat_text(_directoryInputs + "solver.json");
     Json::Value mat_root;
     Json::Reader mat_reader;
     bool parsingSuccessful = mat_reader.parse(mat_text, mat_root);
@@ -240,4 +240,14 @@ std::vector<MaterialThermal> MaterialThermal::readMaterialInputs()
 
 
 
+void MaterialThermal::setInputDirectory(const std::string& directoryPath)
+{
+    _directoryInputs = directoryPath;
+}
+
+
+std::string MaterialThermal::getInputDirectory()
+{
+    return _directoryInputs;
+}
 

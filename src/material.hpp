@@ -51,6 +51,8 @@ class LinearElasticMaterial
 
 // Data structure to hold material properties of domain for heat transfer problem.
 class MaterialThermal{
+    private:
+    static std::string _directoryInputs;
 
     public:
     // Default Constructor and Destructors
@@ -82,6 +84,10 @@ class MaterialThermal{
 
     // Static function can be used without object, reads all material properties for Heat Transfer defined in inputs file
     static std::vector<MaterialThermal> readMaterialInputs();
+
+    void setInputDirectory(const std::string& inputJsonDirectory);
+
+    std::string getInputDirectory();
 };
 
 
