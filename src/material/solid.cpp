@@ -1,0 +1,8 @@
+LinearElasticMaterial::LinearElasticMaterial() {
+
+}
+
+LinearElasticMaterial::~LinearElasticMaterial() {
+
+}
+
