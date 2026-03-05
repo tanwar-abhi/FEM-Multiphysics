@@ -1,0 +1,36 @@
+{
+    "dirichletBC":
+    [
+        {
+            "name" : "fixed end X-axis",
+            "type" : "constant",
+            "variable" : "dispX",
+			"meshFile": "CM-Tria2ndOrder.msh",
+            "meshField" : "essential BC edge dirichlet",
+            "value" : 0
+        },
+        {
+            "name" : "fixed end Y-axis",
+            "type" : "constant",
+            "variable" : "dispY",
+			"meshFile": "CM-Tria2ndOrder.msh",
+            "meshField" : "essential BC edge dirichlet",
+            "value" : 0
+        }
+    ],
+
+
+    "neumannBC":
+    [
+        {
+            "name" : "traction boundary end",
+            "type" : "constant",
+            "boundaryType" : "normalToBoundary",
+            "variable" : "traction",
+			"meshFile": "CM-Tria2ndOrder.msh",
+            "meshField" : "neuman BC edge traction",
+            "values" : [0, 100]
+        }
+    ]
+}
+

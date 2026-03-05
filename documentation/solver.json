@@ -1,0 +1,36 @@
+{
+	"solver":
+	[
+		{
+			"coordinateSystem" 	: "2D",
+			"type" 		: "steady",
+			"algorithm": "classical"
+		}
+	],
+
+	"equation": 
+	[
+		{
+			"name": "equation1",
+			"type": "linearElastic",
+			"meshFile": "CM-Tria2ndOrder.msh",
+			"meshField": "Domain",
+			"materialPropertyName" : "Steel",
+			"feShape" : "4NodeQuad",
+			"gaussPoints" : 4
+		}
+	],
+
+	"materialProperty": 
+	[
+		{
+			"name": "Steel",
+			"type": "linearElastic",
+			"youngsMod" : 240.565,
+			"nu" : 0.3,
+			"thickness": 1
+		}
+	]
+}
+
+
