@@ -30,11 +30,11 @@ int main()
 {
 
     //Object containing mesh parts defined by the user in the parts Input file
-    PartsInp partsInput;
+    PartsInput partsInput;
     partsInput.readPartInputs();
 
     // Oject containing solver inputs defined by user in the inputs file
-    SolverInp solverInput;
+    SolverInput solverInput;
     solverInput.readInputs();
 
     // Material vector objects containing material details for problem
@@ -58,8 +58,6 @@ int main()
     BoundaryConditions boundary;
     boundary.readBoundaryInputs();
 
-
-    // Read mesh object constructor.
     readMesh mesh(partsInput, solverInput.dimension);
 
     // Read elements

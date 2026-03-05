@@ -21,13 +21,13 @@ class Part {
 };
 
 
-class PartsInp {
+class PartsInput {
     public:
-    PartsInp();
-    ~PartsInp();
+    PartsInput();
+    ~PartsInput();
 
     // Deep Copy Constructor for PartsInp
-    PartsInp(const PartsInp &obj);
+    PartsInput(const PartsInput &obj);
 
     int numParts = 0;
     Part* part = NULL;

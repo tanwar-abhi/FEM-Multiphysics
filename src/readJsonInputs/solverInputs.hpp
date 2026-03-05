@@ -10,6 +10,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <memory>
+
 class Equation {
 
     public:
@@ -57,14 +59,14 @@ class Equation {
     int ocType = 0;
 };
 
-class SolverInp {
+class SolverInput {
 
     public:
-    SolverInp();
-    ~SolverInp();
+    SolverInput();
+    ~SolverInput();
 
     // Copy constructor
-    SolverInp(const SolverInp &obj);
+    SolverInput(const SolverInput &obj);
 
     std::string coordinateSystem;
     int dimension;
@@ -103,7 +105,8 @@ class SolverInp {
     // number of equations
     int nEquations;
 
-    Equation* equations = NULL;
+    // Equation* equations = NULL;
+    std::shared_ptr<Equation> equations;
 
     void readInputs(); 
 };

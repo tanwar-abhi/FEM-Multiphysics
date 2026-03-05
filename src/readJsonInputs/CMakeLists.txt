@@ -2,6 +2,7 @@
 set(readInputsCode
 	partInputs.cpp		partInputs.hpp
 	solverInputs.cpp	solverInputs.hpp
+	boundaryInputs.cpp	boundaryInputs.hpp
 )
 
 # Create a static library (*.so) of element code for linking with final executable

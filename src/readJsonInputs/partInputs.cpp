@@ -18,13 +18,13 @@ Part::Part(const std::string m_name, const std::string m_format, const std::stri
     meshFileName = m_meshFileName;
 }
 
-PartsInp::PartsInp()
+PartsInput::PartsInput()
 {
 
 }
 
-// Copy(Deep) constructor for partsInp, to be called whenever an object is called as argument to a function.
-PartsInp::PartsInp(const PartsInp &obj)
+// Copy(Deep) constructor for PartsInput, to be called whenever an object is called as argument to a function.
+PartsInput::PartsInput(const PartsInput &obj)
 {
     numParts = obj.numParts;
 
@@ -38,7 +38,7 @@ PartsInp::PartsInp(const PartsInp &obj)
 }
 
 
-PartsInp::~PartsInp()
+PartsInput::~PartsInput()
 {
 
     // Release the block of memory
@@ -46,7 +46,7 @@ PartsInp::~PartsInp()
     delete[] part;
 }
 
-void PartsInp::readPartInputs()
+void PartsInput::readPartInputs()
 {
     std::ifstream part_text ("parts.json");
     Json::Reader part_reader;
