@@ -8,12 +8,14 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <memory>
+#include <vector>
 
 class Part {
     public:
     Part();
     ~Part();
-    Part(const std::string m_name, const std::string m_format, const std::string m_meshFileName);
+    Part(const std::string& m_name, const std::string& m_format, const std::string& m_meshFileName);
 
     std::string name;
     std::string format;
@@ -22,16 +24,22 @@ class Part {
 
 
 class PartsInput {
+    private:
+    int numParts{0};
+
     public:
     PartsInput();
     ~PartsInput();
 
+    void setNumberOfParts(int);
+    int getNumberOfParts();
+
     // Deep Copy Constructor for PartsInp
     PartsInput(const PartsInput &obj);
 
-    int numParts = 0;
-    Part* part = NULL;
+    // Part* part = NULL;
+    std::vector<std::shared_ptr<Part>> parts;
 
-    void readPartInputs();
+    void readPartInputs(const std::string&);
 };
 

@@ -1,6 +1,8 @@
 
 #include "partInputs.hpp"
 
+#include <filesystem>
+
 Part::Part()
 {
 
@@ -11,7 +13,7 @@ Part::~Part()
 
 }
 
-Part::Part(const std::string m_name, const std::string m_format, const std::string m_meshFileName)
+Part::Part(const std::string& m_name, const std::string& m_format, const std::string& m_meshFileName)
 {
     name = m_name;
     format = m_format;
@@ -23,64 +25,63 @@ PartsInput::PartsInput()
 
 }
 
-// Copy(Deep) constructor for PartsInput, to be called whenever an object is called as argument to a function.
+// Copy(Deep) constructor for PartsInput
 PartsInput::PartsInput(const PartsInput &obj)
 {
     numParts = obj.numParts;
-
-    // Allocate new memory from Heap for copy
-    part = new Part[numParts];
-
-    for (int i = 0; i < numParts; i++)
-    {
-        part[i] = obj.part[i];
-    }
+    parts = obj.parts;
 }
-
 
 PartsInput::~PartsInput()
 {
 
-    // Release the block of memory
-    // std::cout<<" # Part Input Destructor #"<<std::endl;
-    delete[] part;
 }
 
-void PartsInput::readPartInputs()
+void PartsInput::setNumberOfParts(int value)
 {
-    std::ifstream part_text ("parts.json");
-    Json::Reader part_reader;
-    Json::Value part_root;
+    numParts = value;
+}
 
-    //test to check if parsing is happening properly
-    bool parsingSuccessful = part_reader.parse(part_text, part_root);
-    if(!parsingSuccessful){
+int PartsInput::getNumberOfParts()
+{
+    return numParts;
+}
+
+void PartsInput::readPartInputs(const std::string& filePath)
+{
+    std::cout<<"current filepath = " << filePath + "parts.json" <<std::endl;
+
+    std::ifstream partsJsonFile(filePath + "parts.json");
+    Json::Reader partsReader;
+    Json::Value partsRoot;
+
+    if(!partsReader.parse(partsJsonFile, partsRoot)){
         std::cerr << "Error while parsing parts"<<std::endl;
         exit(-404);
     }
 
-    const Json::Value inp_parts = part_root["parts"];
+    const Json::Value allParts = partsRoot["parts"];
 
     // Temporary string variable to be read into from PartInputs
     std::string tmp1;
 
-    this->numParts = inp_parts.size();
-    Part *part = new Part[inp_parts.size()];
-    this->part = part;
+    setNumberOfParts(allParts.size());
 
-    for(int index = 0; index < this->numParts; index++){
-        tmp1 = inp_parts[index]["format"].asString();
+    for(int index = 0, n = getNumberOfParts(); index < n; index++)
+    {
+        std::shared_ptr<Part> part = std::make_shared<Part>();
+
+        tmp1 = allParts[index]["format"].asString();
         std::transform(tmp1.begin(), tmp1.end(), tmp1.begin(), ::toupper);
+        part->format = tmp1;
 
-        this->part[index].format = tmp1;
-
-        tmp1 = inp_parts[index]["name"].asString();
+        tmp1 = allParts[index]["name"].asString();
         std::transform(tmp1.begin(), tmp1.end(), tmp1.begin(), ::toupper);
+        part->name = tmp1;
 
-        this->part[index].name = tmp1;
+        tmp1 = allParts[index]["meshFileName"].asString();
+        part->meshFileName = tmp1;
 
-        tmp1 = inp_parts[index]["meshFileName"].asString();
-
-        this->part[index].meshFileName = tmp1;
+        parts.emplace_back(part);
     }
 }
