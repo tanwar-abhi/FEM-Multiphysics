@@ -12,8 +12,8 @@
 
 #include <memory>
 
-class Equation {
-
+class Equation 
+{
     public:
     Equation();
     ~Equation();
@@ -26,14 +26,14 @@ class Equation {
     9-> plate, 10-> Truss, 11->Frames (beams+Truss), 12-> Shell, 13-> Linear Elastic (Plane Strain),
     14 -> 3D Linear Elasticity, 15 -> Topology Optimization
     */
-    int solverEq;
+    int solverEquation;
 
     // Mesh file path and name with extension {.msh}
     std::string meshFile;
     std::string meshField;
 
     // Name of material property
-    std::string materialPropName;
+    std::string materialPropertyName;
 
     // Degree of freedom at each node for each problem type (as per solverEq)
     int DOF;
@@ -46,10 +46,10 @@ class Equation {
     int ElementType;
 
     // No. of Gauss Points {integration points} for each element
-    int NGP;
+    int numberOfGaussPoints{0};
     
     // Elemental Tag Id
-    int elemTagId;
+    int elementTagId;
 
     // volume fraction
     double volumeFraction = 0;
@@ -59,7 +59,8 @@ class Equation {
     int ocType = 0;
 };
 
-class SolverInput {
+class SolverInput 
+{
 
     public:
     SolverInput();
@@ -103,12 +104,11 @@ class SolverInput {
     int massMatrixType;
 
     // number of equations
-    int nEquations;
+    int nEquations{0};
 
-    // Equation* equations = NULL;
-    std::shared_ptr<Equation> equations;
+    std::vector<std::shared_ptr<Equation>> equations;
 
-    void readInputs(); 
+    void readInputs(const std::string& inputFilePath);
 };
 
 

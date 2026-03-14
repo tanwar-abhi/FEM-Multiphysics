@@ -36,13 +36,6 @@ SolverInput::SolverInput(const SolverInput &obj)
     eps = obj.eps; THETA = obj.THETA;
     massMatrixType = obj.massMatrixType;
     nEquations = obj.nEquations;
-
-    // // Allocate new memory address to copy all equations
-    // equations = new Equation[nEquations];
-    // for (int i = 0; i < nEquations; i++)
-    // {
-    //     equations[i] = obj.equations[i];
-    // }
     equations = obj.equations;
 }
 
@@ -111,7 +104,18 @@ int getElementType(const std::string &FE_Shape)
 }
 
 
-
+enum class EquationType{
+    PlaneStress,
+    HeatTransfer,
+    Beam,
+    Plate,
+    Truss,
+    Frame,
+    Shell,
+    PlaneStrain,
+    LinearElastic3D,
+    Unknown
+};
 
 
 int getEquationType(std::string tmp)
@@ -153,100 +157,88 @@ int getEquationType(std::string tmp)
 }
 
 
-
-
-void SolverInput::readInputs()
+void SolverInput::readInputs(const std::string& inputFilePath)
 {
+    std::ifstream solverJsonFile(inputFilePath + "solver.json");
 
-    // read  input files
-    std::ifstream text("solver.json");
-
-    if (!text.is_open()){
+    if (!solverJsonFile.is_open()){
         std::cout << "ERROR Solver Inputs :: could not open solver input file" << std::endl;
         exit(-404);
     }
 
-    Json::Value solver_root;
+    Json::Value solverRoot;
     Json::Reader reader;
-    reader.parse(text, solver_root);
+    reader.parse(solverJsonFile, solverRoot);
 
-    Json::Value inp_equation =  solver_root["equation"];
-    this->nEquations = inp_equation.size();
+    const Json::Value inputEquation =  solverRoot["equation"];
+    nEquations = inputEquation.size();
 
     // Temporary string variable to read inputs
     std::string tmp;
 
-    Equation *eqn = new Equation [inp_equation.size()];
-    this->equations = eqn;
-
     for (int index = 0; index < nEquations; ++index)
     {
-        this->equations[index].name = inp_equation[index]["name"].asString();
+        std::shared_ptr<Equation> eqn = std::make_shared<Equation>();
+        eqn->name = inputEquation[index]["name"].asString();
 
-        tmp = inp_equation[index]["type"].asString();
+        tmp = inputEquation[index]["type"].asString();
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        this->equations[index].solverEq = getEquationType(tmp);
+        eqn->solverEquation = getEquationType(tmp);
 
-        tmp = inp_equation[index]["meshField"].asString();
+        tmp = inputEquation[index]["meshField"].asString();
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        this->equations[index].meshField = tmp;
+        eqn->meshField = tmp;
 
-        this->equations[index].meshFile = inp_equation[index]["meshFile"].asString();
+        eqn->meshFile = inputEquation[index]["meshFile"].asString();
 
-        tmp = inp_equation[index]["materialPropertyName"].asString();
+        tmp = inputEquation[index]["materialPropertyName"].asString();
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        this->equations[index].materialPropName = tmp;
+        eqn->materialPropertyName = tmp;
 
-        this->equations[index].NGP = inp_equation[index]["gaussPoints"].asInt();
+        eqn->numberOfGaussPoints = inputEquation[index]["gaussPoints"].asInt();
 
-        this->equations[index].ElementType = getElementType(inp_equation[index]["feShape"].asString());
-        if (equations[index].solverEq == 15)
+        eqn->ElementType = getElementType(inputEquation[index]["feShape"].asString());
+        if (equations[index]->solverEquation == 15)
         {
-            // this->equations[index].penalization = inp_equation[index]["penalization"].asInt();
-            // this->equations[index].filterRadius = inp_equation[index]["filterRadius"].asDouble();
-            this->equations[index].volumeFraction = inp_equation[index]["volumeFraction"].asDouble();
-            // this->equations[index].ocType = inp_equation[index]["ocType"].asInt();
+            // eqn.penalization = inputEquation[index]["penalization"].asInt();
+            // eqn.filterRadius = inputEquation[index]["filterRadius"].asDouble();
+            eqn->volumeFraction = inputEquation[index]["volumeFraction"].asDouble();
+            // eqn.ocType = inputEquation[index]["ocType"].asInt();
         }
     }
 
+    const Json::Value inputSolver = solverRoot["solver"];
 
-    Json::Value inp_solver = solver_root["solver"];
-
-    if (inp_solver.size() > 1){
+    if (inputSolver.size() > 1){
         std::cerr << "Solver Input Error : The number of Solver keywords in solver input should be 1" << std::endl;
         exit(-400);
     }
 
     //   Solver Type ###### ("Solver" Keyword in solver file)
     // index = 0, beacaus there is always single solver property for any problem
-    tmp =  inp_solver[0]["type"].asString();
-
+    tmp =  inputSolver["type"].asString();
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
 
-    if (tmp=="TRANSIENT") {
+    if ( tmp == "TRANSIENT" ) 
+    {
         // std::cout<<"The solver is transient" <<std::endl;
-        this->isTransient = true;
+        isTransient = true;
 
-        this->StartTime = inp_solver[0]["startTime"].asDouble();
-        this->EndTime = inp_solver[0]["endTime"].asDouble();
-        this->dt = inp_solver[0]["timeStep"].asDouble();
-        this->TotalTime = this->EndTime - this->StartTime;
-        this->eps = inp_solver[0]["stoppingCriteria"].asDouble();
-        this->massMatrixType = inp_solver[0]["massMatrixType"].asInt();
+        StartTime = inputSolver["startTime"].asDouble();
+        EndTime = inputSolver["endTime"].asDouble();
+        dt = inputSolver["timeStep"].asDouble();
+        TotalTime = EndTime - StartTime;
+        eps = inputSolver["stoppingCriteria"].asDouble();
+        massMatrixType = inputSolver["massMatrixType"].asInt();
     }
     else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
     {
-        // std::cout << "The solver is steady" << std::endl;
-        this->isTransient = false;
+        std::cout << "The solver is steady state" << std::endl;
+        isTransient = false;
     }
 
-    // Algorithm Selection
-    // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
-    tmp = inp_solver[0]["algorithm"].asString();
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-
     //  Solver dimension
-    tmp = inp_solver[0]["coordinateSystem"].asString();
+    tmp = inputSolver["coordinateSystem"].asString();
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
     coordinateSystem = tmp;
 
@@ -261,9 +253,9 @@ void SolverInput::readInputs()
         exit(-403);
     }
 
-
-    // Read algorithm type from the solver input file
-    tmp = inp_solver[0]["algorithm"].asString();
+    // Algorithm Selection
+    // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
+    tmp = inputSolver["algorithm"].asString();
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
 
     // Ternary operator to make sure algorithm type is classical by default.
@@ -277,28 +269,27 @@ void SolverInput::readInputs()
     //     algorithm = 3;
     // }
 
-
     for (int i = 0; i < nEquations; i++)
     {
         if (dimension == 2){
             // Linear elastic plane stress(1) and plane strain(13)
-            if (equations[i].solverEq == 1 || equations[i].solverEq == 13){
-                equations[i].DOF = 2;
+            if (equations[i]->solverEquation == 1 || equations[i]->solverEquation == 13){
+                equations[i]->DOF = 2;
             }
             // Thermal equations (scalar field problems)
-            else if (equations[i].solverEq == 2){
-                equations[i].DOF = 1;
+            else if (equations[i]->solverEquation == 2){
+                equations[i]->DOF = 1;
             }
         }
         else if (dimension == 3)
         {
             // 3D linear elasticity equation
-            if (equations[i].solverEq == 14){
-                equations[i].DOF = 3;
+            if (equations[i]->solverEquation == 14){
+                equations[i]->DOF = 3;
             }
             // Thermal problem (scalar field equation problem)
-            else if (equations[i].solverEq == 2){
-                equations[i].DOF = 1;
+            else if (equations[i]->solverEquation == 2){
+                equations[i]->DOF = 1;
             }
         }
         // 1D problems
@@ -307,6 +298,5 @@ void SolverInput::readInputs()
         }
     }
 
-    // std::cout << "done reading the solver input file" << std::endl;
+    std::cout << "done reading the solver input file" << std::endl;
 }
-
