@@ -1,0 +1,10 @@
+Standard Commit Categories (Types) to be used for better commit messages.
+
+feat: Use this when your commit adds a new feature or functionality to your application.
+fix: Use this when your commit represents a bug or error fix for the user.
+refactor: Used for code changes that neither fix a bug nor add a new feature (e.g., restructuring or cleaning up code).
+docs: Changes specifically to documentation (like README, API docs, or wikis).
+chore: Mundane or routine tasks that do not change production code or tests (e.g., updating build scripts, dependency management, or CI configuration).
+style: Changes that do not affect the meaning of the code, such as formatting, white-space fixes, or missing semicolons.
+test: Adding missing tests or refactoring existing ones without touching production code.
+perf: A code change that specifically improves system or application performance.
