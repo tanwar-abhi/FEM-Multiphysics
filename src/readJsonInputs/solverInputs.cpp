@@ -161,6 +161,8 @@ void SolverInput::readInputs(const std::string& inputFilePath)
 {
     std::ifstream solverJsonFile(inputFilePath + "solver.json");
 
+    std::cout<<"path solverJsonFile = "<<inputFilePath + "solver.json"<<std::endl;
+
     if (!solverJsonFile.is_open()){
         std::cout << "ERROR Solver Inputs :: could not open solver input file" << std::endl;
         exit(-404);
@@ -205,6 +207,10 @@ void SolverInput::readInputs(const std::string& inputFilePath)
             eqn->volumeFraction = inputEquation[index]["volumeFraction"].asDouble();
             // eqn.ocType = inputEquation[index]["ocType"].asInt();
         }
+        std::cout<<equations.size()<<"\n";
+        equations.emplace_back(eqn);
+        std::cout<<"after emplace_back"<<equations.size()<<"\n";
+
     }
 
     const Json::Value inputSolver = solverRoot["solver"];
