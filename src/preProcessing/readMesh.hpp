@@ -27,7 +27,7 @@ class readMesh{
     
     public:
     // Object of PartsInp class that is pases as input argument for readMesh constructor
-    PartsInp partsInpObj;
+    PartsInput partsInputObj;
 
     // Total number of elements
     // unsigned long int Nelements;
@@ -68,7 +68,7 @@ class readMesh{
     // Surfaces Boundary;
 
     // Constructor for readmesh object.
-    readMesh(const PartsInp &partsInpObj, int dimension);
+    readMesh(const PartsInput &partsInputObj, int dimension);
 
     // Read nodes coordinates from the msh file
     void readNodes();

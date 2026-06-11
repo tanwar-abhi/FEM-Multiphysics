@@ -1,5 +1,5 @@
 # Define minimum version of CMAKE required for build process
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.20.0)
 
 # Set Project name (executable will be of same name)
 project(simulationMPS VERSION 0.5 LANGUAGES C CXX)
@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 message(STATUS "## C++17 standard selected")
 
 # Compile flag for optimisation or debugger
-set(CMAKE_CXX_FLAGS "-O3")
-# set(CMAKE_CXX_FLAGS "-g")
+# set(CMAKE_CXX_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-g")
 
 # Pthread library for multithreading 
 find_package(Threads)
@@ -56,3 +56,4 @@ target_link_libraries(${PROJECT_NAME} postProcessing)
 target_link_libraries(${PROJECT_NAME} preProcessing)
 target_link_libraries(${PROJECT_NAME} inputsJson)
 target_link_libraries(${PROJECT_NAME} srcFunction)
+target_link_libraries(${PROJECT_NAME} materialsProperty)

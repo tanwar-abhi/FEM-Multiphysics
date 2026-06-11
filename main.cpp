@@ -53,7 +53,6 @@ int main()
         }
     }
 
-
     // Create an object of super class containing all boundary conditions
     BoundaryConditions boundary;
     boundary.readBoundaryInputs();

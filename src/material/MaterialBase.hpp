@@ -4,7 +4,9 @@
 #include <jsoncpp/json/json.h>
 
 #include <string>
+#include <vector>
 
+template <typename T>
 class MaterialBase
 {
     public:
@@ -12,15 +14,20 @@ class MaterialBase
     ~MaterialBase();
 
     void setName(const std::string& name);
-    std::string getName();
+    std::string getName() const;
 
     void setElementTagId(const int& elementID);
-    int getElementTagId();
+    int getElementTagId() const;
 
-    template <typename T>
-    std::vector<T> readMaterialInputs();
+    void setInputsDirectory(const std::string&  inputDirectory);
+    std::string getInputsDirectory() const;
+
+    virtual std::vector<T> readMaterialInputs() = 0;
 
     private:
+    // Directory containing input json files full path
+    static std::string _directoryInputs;
+
     // Material Defination identifier name
     std::string name;
 

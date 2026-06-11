@@ -1,9 +1,7 @@
 
 set(mpsSRCCode
 	boundary_HT.cpp 		boundary_HT.hpp
-	boundaryInputs.cpp		boundaryInputs.hpp
 	dirichletBC.cpp			dirichletBC.hpp
-	material.cpp			material.hpp
 	Matrix_Assemble.cpp		Matrix_Assemble.hpp
 	neumanBC.cpp			neumanBC.hpp
 	structureBoundary.cpp	structureBoundary.hpp
@@ -16,7 +14,8 @@ add_subdirectory(element)
 add_subdirectory(postProcessing)
 add_subdirectory(preProcessing)
 add_subdirectory(readJsonInputs)
- 
+add_subdirectory(material)
+
 # Add directory to the current static shared library
 target_include_directories(srcFunction PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(srcFunction PUBLIC ${CMAKE_SOURCE_DIR}/Libraries/eigen3.3)

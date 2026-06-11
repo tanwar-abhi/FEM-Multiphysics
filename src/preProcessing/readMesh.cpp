@@ -11,19 +11,19 @@ readMesh::~readMesh(){
 
 
 // Read Mesh constructor to initialize filename and dimension of each node
-readMesh::readMesh(const PartsInp &partsInpObj, int dimension)
+readMesh::readMesh(const PartsInput &partsInputObj, int dimension)
 {
     // initialize the value of number of nodes to 0
     this->NNodes = 0;
-    //    this->partsInp = partsInpObj;
+    //    this->PartsInput = PartsInputObj;
     this->NODE_DIM = dimension;
 
-    // Deep Copy of partsInpObj. 
-    // this->partsInpObj = partsInpObj;
-    this->partsInpObj.numParts = partsInpObj.numParts;
-    this->partsInpObj.part = new Part[partsInpObj.numParts];
-    for (int i = 0; i < partsInpObj.numParts; i++){
-        this->partsInpObj.part[i] = partsInpObj.part[i];
+    // Deep Copy of PartsInputObj. 
+    // this->PartsInpututObj = PartsInpututObj;
+    this->partsInpututObj.numParts = PartsInpututObj.numParts;
+    this->partsInpututObj.part = new Part[PartsInpututObj.numParts];
+    for (int i = 0; i < PartsInpututObj.numParts; i++){
+        this->PartsInpututObj.part[i] = PartsInpututObj.part[i];
     }
 
 
@@ -44,9 +44,9 @@ readMesh::readMesh(const PartsInp &partsInpObj, int dimension)
 void readMesh::readElementTagsNew()
 {
     // Open and read file.
-    for (int i=0; i < this->partsInpObj.numParts; i++)
+    for (int i=0; i < this->partsInpututObj.numParts; i++)
     {
-        std::ifstream meshFile(partsInpObj.part[i].meshFileName);
+        std::ifstream meshFile(oartsInpututObj.part[i].meshFileName);
 
 	    // Flags to initiate begin reading total numbers of nodes and elements and element tags from msh file
 	    bool readETag = false;
@@ -109,7 +109,7 @@ void readMesh::readElementTagsNew()
                     std::transform(elemTagName.begin(), elemTagName.end(), elemTagName.begin(), ::toupper);
 			        this->elementalTagIds.push_back(elemTagId) ;
 			        this->elementalTags.push_back(elemTagName) ;
-                    this->elementalTagsMeshName.push_back(partsInpObj.part[i].meshFileName) ;
+                    this->elementalTagsMeshName.push_back(partsInpututObj.part[i].meshFileName) ;
                     this->elementalTagsPartsId.push_back(i);
                 }
 	        }
@@ -173,10 +173,10 @@ void readMesh::pushNodeCoordString(std::string Line, std::vector<std::vector<dou
 void readMesh::readNodes()
 {
     // Open and read file.
-    for (int i=0; i < this->partsInpObj.numParts; i++)
+    for (int i=0; i < this->partsInpututObj.numParts; i++)
     {
       startingNodeIdMesh.push_back(NNodes);
-      std::ifstream meshFile(partsInpObj.part[i].meshFileName);
+      std::ifstream meshFile(partsInpututObj.part[i].meshFileName);
 
       // If File could't be opened
       if (!meshFile)

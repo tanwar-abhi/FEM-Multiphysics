@@ -10,6 +10,10 @@ class LinearElasticMaterial : private MaterialBase
     LinearElasticMaterial();
     ~LinearElasticMaterial();
 
+    LinearElasticMaterial(const float& youngModulus, const float& poissonRatio, 
+                            const double& angularVelocity=0, const double& density
+    );
+
     // Thickness of the domain (only for 2D problems)
     float thickness = 1.0;
 
@@ -25,9 +29,9 @@ class LinearElasticMaterial : private MaterialBase
     // Material density {only for Axisymmetric case}
     double RHO = 0;
 
-    // Static function so that it can be used without an object, this function reads all material properties into a vector,
-    // each element is a different material, defined by user in materil input file
-    static std::vector<LinearElasticMaterial> readMaterialInputs();
+    // // Static function so that it can be used without an object, this function reads all material properties into a vector,
+    // each element is a different material, defined by user in material input file
+    std::vector<LinearElasticMaterial> readMaterialInputs();
 
     Eigen::MatrixXd HookesLawTensor(int eqnType);
 };
