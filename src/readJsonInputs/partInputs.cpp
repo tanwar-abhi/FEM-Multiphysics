@@ -26,11 +26,11 @@ PartsInput::PartsInput()
 }
 
 // Copy(Deep) constructor for PartsInput
-PartsInput::PartsInput(const PartsInput &obj)
-{
-    numParts = obj.numParts;
-    parts = obj.parts;
-}
+// PartsInput::PartsInput(const PartsInput &obj)
+// {
+//     numParts = obj.numParts;
+//     parts = obj.parts;
+// }
 
 PartsInput::~PartsInput()
 {
@@ -42,16 +42,16 @@ void PartsInput::setNumberOfParts(int value)
     numParts = value;
 }
 
-int PartsInput::getNumberOfParts()
+const int PartsInput::getNumberOfParts()
 {
     return numParts;
 }
 
 void PartsInput::readPartInputs(const std::string& filePath)
 {
-    std::cout<<"current filepath = " << filePath + "parts.json" <<std::endl;
+    std::cout<<"current filepath = " << filePath + fileName <<std::endl;
 
-    std::ifstream partsJsonFile(filePath + "parts.json");
+    std::ifstream partsJsonFile(filePath + fileName);
     Json::Reader partsReader;
     Json::Value partsRoot;
 

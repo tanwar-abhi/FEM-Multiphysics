@@ -27,15 +27,17 @@ class PartsInput {
     private:
     int numParts{0};
 
+    const std::string fileName = "partsConfig.json";
+
     public:
     PartsInput();
     ~PartsInput();
 
     void setNumberOfParts(int);
-    int getNumberOfParts();
+    const int getNumberOfParts();
 
     // Deep Copy Constructor for PartsInp
-    PartsInput(const PartsInput &obj);
+    // PartsInput(const PartsInput &obj);
 
     // Part* part = NULL;
     std::vector<std::shared_ptr<Part>> parts;

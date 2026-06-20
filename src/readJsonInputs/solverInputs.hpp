@@ -13,8 +13,51 @@
 
 #include <memory>
 
+
+// helper enum for finite element shapes
+enum class ElementShapeType 
+{
+    TwoNodeRod,
+    ThreeNodeTri,
+    FourNodeQuad,
+    FourNodeTetra,
+    EightNodeHexa,
+    ThreeNodeRod,
+    SixNodeTri,
+    NineNodeQuad,
+    TenNodeTetra,
+    TwentySevenNodeHexa,
+    Unknown
+};
+
+enum class EquationType{
+    Beam,
+    Plate,
+    Truss,
+    Frame,
+    Shell,
+    PlaneStress,
+    PlaneStrain,
+    LinearElastic3D,
+    HeatTransfer,
+    TopologyOptimization,
+    Unknown
+};
+
+enum class SolverType
+{
+    Steady,
+    Transient,
+    Unknown
+};
+
+
 class Equation 
 {
+    private:
+    // Name of config file that contains the user input prarameters to be read.
+    const std::string fileName = "solverConfig.json";
+
     public:
     Equation();
     ~Equation();
@@ -27,7 +70,7 @@ class Equation
     9-> plate, 10-> Truss, 11->Frames (beams+Truss), 12-> Shell, 13-> Linear Elastic (Plane Strain),
     14 -> 3D Linear Elasticity, 15 -> Topology Optimization
     */
-    int solverEquation;
+    EquationType solverEquation = EquationType::Unknown;
 
     // Mesh file path and name with extension {.msh}
     std::string meshFile;
@@ -44,7 +87,7 @@ class Equation
     2D Elements = 3NodeTria {gmsh=2}, 4NodeQuad {gmsh=3}, 6NodeTria {gmsh=9}, 9NodeQuad {gmsh=10}
     3D Elements = 8NodeHexahedron {gmsh=5}
     */
-    int ElementType;
+    ElementShapeType ElementType = ElementShapeType::Unknown;
 
     // No. of Gauss Points {integration points} for each element
     int numberOfGaussPoints{0};
@@ -52,30 +95,42 @@ class Equation
     // Elemental Tag Id
     int elementTagId;
 
-    // volume fraction
-    double volumeFraction = 0;
 
+    // volume fraction for Topology Optimization
+    double volumeFraction = 0;
 
     // Optimality Criteria Type
     int ocType = 0;
+
+    int penalization {0};
+    double filterRadius {0.0};
 };
 
 class SolverInput 
 {
+    private:
+    bool parseEquationsFromSolverJson(const std::string& solverJsonFile);
+    bool parseSolverFromSolverJson(const std::string& solverJsonFile);
+
+    const std::string fileName = "solverConfig.json";
+
+    // number of equations
+    int totalEquations{0};
+
+    // Boolean variable to check if problem is transient or steady state
+    bool isTransient {false};
 
     public:
     SolverInput();
     ~SolverInput();
 
     // Copy constructor
-    SolverInput(const SolverInput &obj);
+    // SolverInput(const SolverInput &obj);
 
     std::string coordinateSystem;
     int dimension;
 
-
-    // Boolean variable to check if problem is transient or steady state
-    bool isTransient;
+    std::string solverType;
 
     // Type of algorithm for solving Linear system of equations 
     // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
@@ -104,12 +159,13 @@ class SolverInput
     // 0-> Lumped Mass matrix ; 1-> Consistent Mass Matrix
     int massMatrixType;
 
-    // number of equations
-    int nEquations{0};
-
     std::vector<std::shared_ptr<Equation>> equations;
 
-    void readInputs(const std::string& inputFilePath);
+    bool readInputs(const std::string& inputFilePath);
+
+    int getTotalEquations() const;
+
+    bool getIsTransientSolver() const;
 };
 
 

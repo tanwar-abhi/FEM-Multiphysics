@@ -1,0 +1,11 @@
+{
+    "parts":
+    [
+        {
+            "name" : "part1",
+            "format"	: "gmsh",
+            "meshFileName"	: "CM-Tria2ndOrder.msh"
+        }
+    ]
+}
+

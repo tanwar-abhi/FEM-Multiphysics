@@ -33,4 +33,7 @@ class MaterialBase
 
     // Element tag id to map material with equation and boundary
     int elementTagId;
+
+    // Directory containing material inputs file with whole path
+    std::string _directoryInputs;
 };

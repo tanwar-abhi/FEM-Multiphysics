@@ -23,286 +23,378 @@ SolverInput::~SolverInput(){
 }
 
 
-// Deep Copy constructor for SolverInputs, called when one object of class is instantiated using another object of class.
-// It's always called when object of class pased by value in a function
-SolverInput::SolverInput(const SolverInput &obj)
-{
-    coordinateSystem = obj.coordinateSystem;
-    dimension = obj.dimension;
-    isTransient = obj.isTransient;
-    algorithm = obj.algorithm;
-    StartTime = obj.StartTime; EndTime = obj.EndTime; TotalTime = obj.TotalTime;
-    dt = obj.dt;
-    eps = obj.eps; THETA = obj.THETA;
-    massMatrixType = obj.massMatrixType;
-    nEquations = obj.nEquations;
-    equations = obj.equations;
-}
-
-
-
-// helper enum for finite element shapes
-enum class FE_ShapeType {
-    TwoNodeRod,
-    ThreeNodeTri,
-    FourNodeQuad,
-    FourNodeTetra,
-    EightNodeHexa,
-    ThreeNodeRod,
-    SixNodeTri,
-    NineNodeQuad,
-    TenNodeTetra,
-    TwentySevenNodeHexa,
-    Unknown
-};
+// // Deep Copy constructor for SolverInputs, called when one object of class is instantiated using another object of class.
+// // It's always called when object of class pased by value in a function
+// SolverInput::SolverInput(const SolverInput &obj)
+// {
+//     coordinateSystem = obj.coordinateSystem;
+//     dimension = obj.dimension;
+//     isTransient = obj.isTransient;
+//     algorithm = obj.algorithm;
+//     StartTime = obj.StartTime; EndTime = obj.EndTime; TotalTime = obj.TotalTime;
+//     dt = obj.dt;
+//     eps = obj.eps; THETA = obj.THETA;
+//     massMatrixType = obj.massMatrixType;
+//     nEquations = obj.nEquations;
+//     equations = obj.equations;
+// }
 
 // mapping from FE shape string to enum; faster and centralised
-const std::unordered_map<std::string, FE_ShapeType> shapeMap = {
-    {"2NodeRod", FE_ShapeType::TwoNodeRod},
-    {"3NodeTri", FE_ShapeType::ThreeNodeTri},
-    {"4NodeQuad", FE_ShapeType::FourNodeQuad},
-    {"4NodeTetra", FE_ShapeType::FourNodeTetra},
-    {"8NodeHexa", FE_ShapeType::EightNodeHexa},
-    {"3NodeRod", FE_ShapeType::ThreeNodeRod},
-    {"6NodeTri", FE_ShapeType::SixNodeTri},
-    {"9NodeQuad", FE_ShapeType::NineNodeQuad},
-    {"10NodeTetra", FE_ShapeType::TenNodeTetra},
-    {"27NodeHexa", FE_ShapeType::TwentySevenNodeHexa}
+const std::unordered_map<std::string, ElementShapeType> shapeMap = {
+    {"2NODEROD", ElementShapeType::TwoNodeRod},
+    {"3NODETRI", ElementShapeType::ThreeNodeTri},
+    {"4NODEQUAD", ElementShapeType::FourNodeQuad},
+    {"4NODETETRA", ElementShapeType::FourNodeTetra},
+    {"8NODEHEXA", ElementShapeType::EightNodeHexa},
+    {"3NODEROD", ElementShapeType::ThreeNodeRod},
+    {"6NODETRI", ElementShapeType::SixNodeTri},
+    {"9NODEQUAD", ElementShapeType::NineNodeQuad},
+    {"10NODETETRA", ElementShapeType::TenNodeTetra},
+    {"27NODEHEXA", ElementShapeType::TwentySevenNodeHexa},
+    {"UNKNOWN", ElementShapeType::Unknown}
 };
 
-// convert string to enum value using lookup table
-static FE_ShapeType shapeFromString(const std::string &s)
+// const std::unordered_map<std::string, ElementShapeType> shapeMap = {
+const std::unordered_map<std::string, EquationType> equationTypeMap = {
+    {"PLANESTRESS", EquationType::PlaneStress},
+    {"ELASTIC", EquationType::PlaneStress},
+    {"LINEARELASTIC", EquationType::PlaneStress},
+    {"HEATTRANSFER", EquationType::HeatTransfer},
+    {"BEAM", EquationType::Beam},
+    {"PLATE", EquationType::Plate},
+    {"TRUSS", EquationType::Truss},
+    {"FRAME", EquationType::Frame},
+    {"SHELL", EquationType::Shell},
+    {"PLANESTRAIN", EquationType::PlaneStrain},
+    {"LINEARELASTIC3D", EquationType::LinearElastic3D},
+    {"OPTIMIZATION", EquationType::TopologyOptimization},
+    {"UNKNONW", EquationType::Unknown}
+};
+
+// convert shape function from string to enum value using lookup table
+static ElementShapeType getElementShapeType(const std::string &s)
 {
     auto it = shapeMap.find(s);
     if (it != shapeMap.end())
         return it->second;
-    return FE_ShapeType::Unknown;
+    return ElementShapeType::Unknown;
 }
 
-int getElementType(const std::string &FE_Shape)
+// convert equation type from string to enum value using lookup table
+EquationType getEquationType(const std::string& equationString)
 {
-    FE_ShapeType shape = shapeFromString(FE_Shape);
+    auto it = equationTypeMap.find(equationString);
+    if (it != equationTypeMap.end())
+    {
+        return it->second;
+    }
+    return EquationType::Unknown;
+}
 
-    switch (shape) {
-    case FE_ShapeType::TwoNodeRod:       return 1;
-    case FE_ShapeType::ThreeNodeTri:     return 2;
-    case FE_ShapeType::FourNodeQuad:     return 3;
-    case FE_ShapeType::FourNodeTetra:    return 4;
-    case FE_ShapeType::EightNodeHexa:    return 5;
-    case FE_ShapeType::ThreeNodeRod:     return 8;
-    case FE_ShapeType::SixNodeTri:       return 9;
-    case FE_ShapeType::NineNodeQuad:     return 10;
-    case FE_ShapeType::TenNodeTetra:     return 11;
-    case FE_ShapeType::TwentySevenNodeHexa: return 12;
-    default:
-        std::cerr << "Error : Element selection unavailable, check the selected element" << std::endl;
-        exit(-404);
+bool SolverInput::readInputs(const std::string& inputFilePath)
+{
+
+    bool result{false};
+
+    try{
+        result = parseEquationsFromSolverJson(inputFilePath);
+        if (result)
+        {
+            result = parseSolverFromSolverJson(inputFilePath);
+            if (!result)
+            {
+                std::cout<<"[Error] Failed to parse solver details from sovlerInputs json file.\n";
+                return result;
+            }
+            std::cout << "done reading the solver input file" << std::endl;
+        }
+        else
+        {
+            std::cout<<"[Error] Failed to parse Equations details from sovlerInputs json file.\n";
+            return result;
+        }
+    }
+    catch (const std::runtime_error& e)
+    {
+        result = false;
+        std::cerr<<"[Error] Caught Runtime exception : "<<e.what()<<std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        result = false;
+        std::cerr<<"[Error] Caught Standard Exception : "<<e.what()<<std::endl;
+    }
+    catch (...) {
+        result = false;
+        std::cerr << "[Error] Caught an unknown exception!" << std::endl;
     }
 
-    // unreachable, but keeps compiler happy
-    return 0;
+    return result;
 }
 
 
-enum class EquationType{
-    PlaneStress,
-    HeatTransfer,
-    Beam,
-    Plate,
-    Truss,
-    Frame,
-    Shell,
-    PlaneStrain,
-    LinearElastic3D,
-    Unknown
-};
-
-
-int getEquationType(std::string tmp)
+bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPath)
 {
-    if (tmp == "PLANESTRESS" || tmp == "ELASTIC" || tmp == "LINEARELASTIC" || tmp == "LINEAR_ELASTIC")
-        // LINEAR ELASTIC plane stress Equation
-        return 1;
-    else if (tmp == "HT" || tmp == "HEATTRANSFER" || tmp == "HEAT_TRANSFER")
-        // Thermal Equation, HEAT TRANSFER problems
-        return 2;
-    else if (tmp == "BEAM")
-        // std::cout << "Equation is BEAM" << std::endl;
-        return 3;
-    else if (tmp == "PLATE")
-        // std::cout<<"Equation is PLATE" <<std::endl;
-        return 9;
-    else if (tmp == "TRUSS")
-        // std::cout<<"Equation is TRUSS" <<std::endl;
-        return 10;
-    else if (tmp == "FRAME")
-        // std::cout<<"Equation is FRAME" <<std::endl;
-        return 11;
-    else if (tmp == "SHELL")
-        // std::cout<<"Equation is SHELL" <<std::endl;
-        return 12;
-    else if (tmp == "PLANESTRAIN" || tmp == "PE" || tmp == "LE_PLAINSTRAIN")
-        // std::cout<<"Equation is LE PLAIN strain" <<std::endl;
-        return 13;
-    else if (tmp == "3DLINEARELASTIC" || tmp == "3DLE" || tmp == "LINEARELASTIC3D")
-        // 3D linear Elasticity
-        return 14;
-    // else if (tmp == "OPTIMIZATION")
-        // return 15;
-    else{
-        std::cerr<<"Error : Equation type not defined, "<<std::endl;
-        exit(-417);
-    }
-    return 0;
-}
+    std::ifstream solverJsonFile(jsonFileFullPath + fileName);
 
-
-void SolverInput::readInputs(const std::string& inputFilePath)
-{
-    std::ifstream solverJsonFile(inputFilePath + "solver.json");
-
-    std::cout<<"path solverJsonFile = "<<inputFilePath + "solver.json"<<std::endl;
+    std::cout<<"[Debug] SolverInput::parseEquationFromSolverJson path solverJsonFile = "<<jsonFileFullPath + fileName<<std::endl;
 
     if (!solverJsonFile.is_open()){
-        std::cout << "ERROR Solver Inputs :: could not open solver input file" << std::endl;
-        exit(-404);
+        std::runtime_error("[Error] SolverInput::parseEquationsFromSolverJson :: could not open solver input file");
     }
 
-    Json::Value solverRoot;
+    Json::Value solverInput;
     Json::Reader reader;
-    reader.parse(solverJsonFile, solverRoot);
+    reader.parse(solverJsonFile, solverInput);
 
-    const Json::Value inputEquation =  solverRoot["equation"];
-    nEquations = inputEquation.size();
+    const Json::Value equationInput = solverInput["equation"];
+    totalEquations = equationInput.size();
 
     // Temporary string variable to read inputs
     std::string tmp;
+    bool equationReadingResult {false};
 
-    for (int index = 0; index < nEquations; ++index)
+    if (equationInput.isArray())
     {
-        std::shared_ptr<Equation> eqn = std::make_shared<Equation>();
-        eqn->name = inputEquation[index]["name"].asString();
-
-        tmp = inputEquation[index]["type"].asString();
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        eqn->solverEquation = getEquationType(tmp);
-
-        tmp = inputEquation[index]["meshField"].asString();
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        eqn->meshField = tmp;
-
-        eqn->meshFile = inputEquation[index]["meshFile"].asString();
-
-        tmp = inputEquation[index]["materialPropertyName"].asString();
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-        eqn->materialPropertyName = tmp;
-
-        eqn->numberOfGaussPoints = inputEquation[index]["gaussPoints"].asInt();
-
-        eqn->ElementType = getElementType(inputEquation[index]["feShape"].asString());
-        if (equations[index]->solverEquation == 15)
+        for (int index = 0; index < totalEquations; index++)
         {
-            // eqn.penalization = inputEquation[index]["penalization"].asInt();
-            // eqn.filterRadius = inputEquation[index]["filterRadius"].asDouble();
-            eqn->volumeFraction = inputEquation[index]["volumeFraction"].asDouble();
-            // eqn.ocType = inputEquation[index]["ocType"].asInt();
+            std::shared_ptr<Equation> eqn = std::make_shared<Equation>();
+
+            if (equationInput[index].isMember("name") && equationInput[index]["name"].isString())
+            {
+                eqn->name = equationInput[index]["name"].asString();
+            }
+    
+            if (equationInput[index].isMember("type") && equationInput[index]["type"].isString())
+            {
+                tmp = equationInput[index]["type"].asString();
+                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+                eqn->solverEquation = getEquationType(tmp);
+            }
+            else{
+                throw std::runtime_error("sovler input file, equation object doesn't contain equation Type.");
+            }
+
+
+            if (equationInput[index].isMember("meshField") && equationInput[index]["meshField"].isString())
+            {
+                tmp = equationInput[index]["meshField"].asString();
+                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+                eqn->meshField = tmp;
+            }
+            else{
+                throw std::runtime_error("sovler input file, equation field doesn't contain meshField.");
+            }
+    
+            if (equationInput[index].isMember("meshFile") && equationInput[index]["meshFile"].isString())
+            {
+                eqn->meshFile = equationInput[index]["meshFile"].asString();
+            }
+            else{
+                throw std::runtime_error("sovler input file, equation field doesn't contain mesh file name.");
+            }
+    
+            if (equationInput[index].isMember("materialPropertyName") && equationInput[index]["materialPropertyName"].isString())
+            {
+                tmp = equationInput[index]["materialPropertyName"].asString();
+                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+                eqn->materialPropertyName = tmp;
+            }
+            else{
+                throw std::runtime_error("sovler input file, equation field doesn't contain materialPropertyName.");
+            }
+
+            if (equationInput[index].isMember("gaussPoints") && equationInput[index]["gaussPoints"].isInt())
+            {
+                eqn->numberOfGaussPoints = equationInput[index]["gaussPoints"].asInt();
+            }
+            else{
+                throw std::runtime_error("sovler input file, equation field doesn't contain total gauss points for each element.");
+            }
+
+            eqn->ElementType = getElementShapeType(equationInput[index]["feShape"].asString());
+
+            if (eqn->solverEquation == EquationType::TopologyOptimization)
+            {
+                if (equationInput[index].isMember("volumeFraction") && equationInput[index]["volumeFraction"].isString())
+                {
+                    eqn->volumeFraction = equationInput[index]["volumeFraction"].asDouble();
+                }
+                if (equationInput[index].isMember("penalization") && equationInput[index]["penalization"].isString())
+                {
+                    eqn->penalization = equationInput[index]["penalization"].asInt();
+                }
+                if (equationInput[index].isMember("filterRadius") && equationInput[index]["filterRadius"].isString())
+                {
+                    eqn->filterRadius = equationInput[index]["filterRadius"].asDouble();
+                }
+                if (equationInput[index].isMember("ocType") && equationInput[index]["ocType"].isString())
+                {
+                    eqn->ocType = equationInput[index]["ocType"].asInt();
+                }
+            }
+            std::cout<<equations.size()<<"\n";
+            equations.emplace_back(eqn);
+            // std::cout<<"after emplace_back"<<equations.size()<<"\n";x
+            equationReadingResult = true;
         }
-        std::cout<<equations.size()<<"\n";
-        equations.emplace_back(eqn);
-        std::cout<<"after emplace_back"<<equations.size()<<"\n";
-
+    }
+    else{
+        throw std::runtime_error("solver.json input file does't contain equation details.");
     }
 
-    const Json::Value inputSolver = solverRoot["solver"];
+    return equationReadingResult;
+}
 
-    if (inputSolver.size() > 1){
-        std::cerr << "Solver Input Error : The number of Solver keywords in solver input should be 1" << std::endl;
-        exit(-400);
+
+bool SolverInput::parseSolverFromSolverJson(const std::string& jsonFileFullPath)
+{
+    std::ifstream solverJsonFile(jsonFileFullPath + fileName);
+
+    std::cout<<"[Debug] SolverInput::parseSolverFromSolverJson path solverJsonFile = "<<jsonFileFullPath + fileName<<std::endl;
+
+    if (!solverJsonFile.is_open()){
+        std::runtime_error("[Error] SolverInput::parseSolverFromSolverJson :: could not open solver input file");
     }
+    
+    Json::Value solverInput;
+    Json::Reader reader;
+    reader.parse(solverJsonFile, solverInput);
 
-    //   Solver Type ###### ("Solver" Keyword in solver file)
-    // index = 0, beacaus there is always single solver property for any problem
-    tmp =  inputSolver["type"].asString();
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+    const Json::Value inputSolver = solverInput["solver"];
 
-    if ( tmp == "TRANSIENT" ) 
+    bool solverParsingSucessful {false};
+
+    std::string tmp;
+
+    if (!inputSolver.isObject()){
+        std::runtime_error("[Error] SolverInput::parseSolverFromSovlerJson solver.json file does't contian required solver object.");
+    }
+    // if (inputSolver.isObject())
+    else
     {
-        // std::cout<<"The solver is transient" <<std::endl;
-        isTransient = true;
-
-        StartTime = inputSolver["startTime"].asDouble();
-        EndTime = inputSolver["endTime"].asDouble();
-        dt = inputSolver["timeStep"].asDouble();
-        TotalTime = EndTime - StartTime;
-        eps = inputSolver["stoppingCriteria"].asDouble();
-        massMatrixType = inputSolver["massMatrixType"].asInt();
+        //   Solver Type ###### ("Solver" Keyword in solver file)
+        // index = 0, beacaus there is always single solver property for any problem
+        if (inputSolver.isMember("type") && inputSolver["type"].isString())
+        {
+            tmp =  inputSolver["type"].asString();
+            solverType = tmp;
+        }
+        else{
+            throw std::runtime_error("Solver type is not present");
+        }
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+    
+        if ( tmp == "TRANSIENT" ) 
+        {
+            std::cout<<"The solver type is transient" <<std::endl;
+            isTransient = true;
+    
+            if (inputSolver.isMember("startTime") && inputSolver["startTime"].isDouble())
+            {
+                StartTime = inputSolver["startTime"].asDouble();
+            }
+            if (inputSolver.isMember("endTime") && inputSolver.isDouble())
+            {
+                EndTime = inputSolver["endTime"].asDouble();
+            }
+            if (inputSolver.isMember("timeStep") && inputSolver.isDouble())
+            {
+                dt = inputSolver["timeStep"].asDouble();
+            }
+            if(inputSolver.isMember("massMatrixType") && inputSolver["massMatrixType"].isInt())
+            {
+                massMatrixType = inputSolver["massMatrixType"].asInt();
+            }
+            if(inputSolver.isMember("stoppingCriteria") && inputSolver["stoppingCriteria"].isDouble())
+            {
+                eps = inputSolver["stoppingCriteria"].asDouble();
+            }
+            TotalTime = EndTime - StartTime;
+        }
+        else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
+        {
+            std::cout << "The solver is steady state" << std::endl;
+            isTransient = false;
+        }
+    
+        //  Solver dimension
+        if (inputSolver.isMember("coordinateSystem") && inputSolver["coordinateSystem"].isString())
+        {
+            tmp = inputSolver["coordinateSystem"].asString();
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+            coordinateSystem = tmp;
+        }
     }
-    else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
-    {
-        std::cout << "The solver is steady state" << std::endl;
-        isTransient = false;
-    }
 
-    //  Solver dimension
-    tmp = inputSolver["coordinateSystem"].asString();
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-    coordinateSystem = tmp;
-
-    if (tmp == "1D")
+    if (coordinateSystem == "1D")
         dimension = 1;
-    else if (tmp == "2D" || tmp == "AXIS")
+    else if (coordinateSystem == "2D" || coordinateSystem == "AXIS")
         dimension = 2;
-    else if (tmp == "3D")
+    else if (coordinateSystem == "3D")
         dimension = 3;
     else{
-        std::cerr<<"Dimension Error : Invalid Coordinate System selected"<<std::endl;
-        exit(-403);
+        std::runtime_error("[Error] SovlerInput::parseSolverFromSolverJson Dimension Invalid Coordinate System selected");
     }
 
-    // Algorithm Selection
-    // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
-    tmp = inputSolver["algorithm"].asString();
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+    std::cout<<"CoordinateSystem ="<<coordinateSystem<<" ; Dimension ="<<dimension<<std::endl;
+    // // Algorithm Selection
+    // // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
+    // tmp = inputSolver["algorithm"].asString();
+    // std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
 
-    // Ternary operator to make sure algorithm type is classical by default.
-    algorithm = tmp == "QUANTUM" ? 3 : 1;
+    // // Ternary operator to make sure algorithm type is classical by default.
+    // algorithm = tmp == "QUANTUM" ? 3 : 1;
 
-    // if (tmp == "CLASSICAL")
-    //     algorithm = 1;
-    // else if(tmp == "HYBRID")
-    //     algorithm = 2;
-    // else if(tmp == "QUANTUM"){
-    //     algorithm = 3;
-    // }
+    // // if (tmp == "CLASSICAL")
+    // //     algorithm = 1;
+    // // else if(tmp == "HYBRID")
+    // //     algorithm = 2;
+    // // else if(tmp == "QUANTUM"){
+    // //     algorithm = 3;
+    // // }
 
-    for (int i = 0; i < nEquations; i++)
+    solverParsingSucessful = true;
+
+    for (int i = 0; i < totalEquations; i++)
     {
         if (dimension == 2){
             // Linear elastic plane stress(1) and plane strain(13)
-            if (equations[i]->solverEquation == 1 || equations[i]->solverEquation == 13){
+            if (equations[i]->solverEquation == EquationType::PlaneStress || equations[i]->solverEquation == EquationType::PlaneStrain){
                 equations[i]->DOF = 2;
             }
             // Thermal equations (scalar field problems)
-            else if (equations[i]->solverEquation == 2){
+            else if (equations[i]->solverEquation == EquationType::HeatTransfer){
                 equations[i]->DOF = 1;
             }
         }
         else if (dimension == 3)
         {
             // 3D linear elasticity equation
-            if (equations[i]->solverEquation == 14){
+            if (equations[i]->solverEquation == EquationType::LinearElastic3D){
                 equations[i]->DOF = 3;
             }
             // Thermal problem (scalar field equation problem)
-            else if (equations[i]->solverEquation == 2){
+            else if (equations[i]->solverEquation == EquationType::HeatTransfer){
                 equations[i]->DOF = 1;
             }
         }
         // 1D problems
         else{
             // ######### Define DOF for 1D problems here #############
+            solverParsingSucessful = false;
+            throw std::runtime_error("1D problems are currently unavailable.");
         }
     }
+    return solverParsingSucessful;
+}
 
-    std::cout << "done reading the solver input file" << std::endl;
+int SolverInput::getTotalEquations() const
+{
+    return totalEquations;
+}
+
+bool SolverInput::getIsTransientSolver() const
+{
+    return isTransient;
 }
