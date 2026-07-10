@@ -82,12 +82,18 @@ static ElementShapeType lookUpElementShapeType(const std::string &s)
 }
 
 // convert equation type from string to enum value using lookup table
-EquationType searchEquationType(const std::string& equationString)
+EquationType SolverInput::searchEquationType(const std::string& equationString)
 {
     std::transform(equationString.begin(), equationString.end(), equationString.begin(), ::toupper);
     auto it = equationTypeMap.find(equationString);
     if (it != equationTypeMap.end()) {
-        return it->second;
+        if ( coordinateSystem == "AXIS" && (it->second == EquationType::PlaneStrain || it->second == EquationType::PlaneStress))
+        {
+            return EquationType::Axisymmetric2D;
+        }
+        else {
+            return it->second;
+        }
     }
     return EquationType::Unknown;
 }

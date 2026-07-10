@@ -41,6 +41,7 @@ enum class EquationType{
     LinearElastic3D,
     HeatTransfer,
     TopologyOptimization,
+    Axisymmetric2D,
     Unknown
 };
 
@@ -111,6 +112,8 @@ class SolverInput
     private:
     bool parseEquationsFromSolverJson(const std::string& solverJsonFile);
     bool parseSolverFromSolverJson(const std::string& solverJsonFile);
+
+    EquationType searchEquationType(const std::string& equationString);
 
     const std::string fileName = "solverConfig.json";
 
