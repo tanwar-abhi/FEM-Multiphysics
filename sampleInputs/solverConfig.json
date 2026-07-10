@@ -27,6 +27,7 @@
 			"type": "linearElastic",
 			"youngsModulus" : 240.565,
 			"nu" : 0.3,
+			"rho" : 5.3,
 			"thickness": 1
 		}
 	]

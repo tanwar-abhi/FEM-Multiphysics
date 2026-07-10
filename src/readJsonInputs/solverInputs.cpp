@@ -72,8 +72,9 @@ const std::unordered_map<std::string, EquationType> equationTypeMap = {
 };
 
 // convert shape function from string to enum value using lookup table
-static ElementShapeType getElementShapeType(const std::string &s)
+static ElementShapeType lookUpElementShapeType(const std::string &s)
 {
+    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
     auto it = shapeMap.find(s);
     if (it != shapeMap.end())
         return it->second;
@@ -81,11 +82,11 @@ static ElementShapeType getElementShapeType(const std::string &s)
 }
 
 // convert equation type from string to enum value using lookup table
-EquationType getEquationType(const std::string& equationString)
+EquationType searchEquationType(const std::string& equationString)
 {
+    std::transform(equationString.begin(), equationString.end(), equationString.begin(), ::toupper);
     auto it = equationTypeMap.find(equationString);
-    if (it != equationTypeMap.end())
-    {
+    if (it != equationTypeMap.end()) {
         return it->second;
     }
     return EquationType::Unknown;
@@ -93,7 +94,6 @@ EquationType getEquationType(const std::string& equationString)
 
 bool SolverInput::readInputs(const std::string& inputFilePath)
 {
-
     bool result{false};
 
     try{
@@ -168,8 +168,7 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
             if (equationInput[index].isMember("type") && equationInput[index]["type"].isString())
             {
                 tmp = equationInput[index]["type"].asString();
-                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-                eqn->solverEquation = getEquationType(tmp);
+                eqn->solverEquation = searchEquationType(tmp);
             }
             else{
                 throw std::runtime_error("sovler input file, equation object doesn't contain equation Type.");
@@ -212,7 +211,7 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
                 throw std::runtime_error("sovler input file, equation field doesn't contain total gauss points for each element.");
             }
 
-            eqn->ElementType = getElementShapeType(equationInput[index]["feShape"].asString());
+            eqn->ElementType = lookUpElementShapeType(equationInput[index]["feShape"].asString());
 
             if (eqn->solverEquation == EquationType::TopologyOptimization)
             {
@@ -278,14 +277,14 @@ bool SolverInput::parseSolverFromSolverJson(const std::string& jsonFileFullPath)
         if (inputSolver.isMember("type") && inputSolver["type"].isString())
         {
             tmp =  inputSolver["type"].asString();
-            solverType = tmp;
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+            tmp == "TRANSIENT" ? solverType = SolverType::Transient : solverType = SolverType::Steady;
         }
         else{
             throw std::runtime_error("Solver type is not present");
         }
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-    
-        if ( tmp == "TRANSIENT" ) 
+
+        if (solverType == SolverType::Transient)
         {
             std::cout<<"The solver type is transient" <<std::endl;
             isTransient = true;
@@ -312,10 +311,14 @@ bool SolverInput::parseSolverFromSolverJson(const std::string& jsonFileFullPath)
             }
             TotalTime = EndTime - StartTime;
         }
-        else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
+        // else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
+        else if (solverType == SolverType::Steady)
         {
             std::cout << "The solver is steady state" << std::endl;
             isTransient = false;
+        }
+        else {
+            throw std::runtime_error("[Error] Incorrect Solver type in solverConfig.json, currently only steady and transient solver available.");
         }
     
         //  Solver dimension

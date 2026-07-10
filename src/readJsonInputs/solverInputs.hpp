@@ -130,7 +130,8 @@ class SolverInput
     std::string coordinateSystem;
     int dimension;
 
-    std::string solverType;
+    // std::string solverType;
+    SolverType solverType = SolverType::Unknown;
 
     // Type of algorithm for solving Linear system of equations 
     // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
@@ -153,7 +154,7 @@ class SolverInput
     THETA = 2.0/3.0 -> Galerkin
     THETA = 1 -> Backward Euler
     */
-    float THETA = 1;
+    float THETA = 1.0;
 
     // Type of mass matrix
     // 0-> Lumped Mass matrix ; 1-> Consistent Mass Matrix
