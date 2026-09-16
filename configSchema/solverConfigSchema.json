@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Solver inputs JSON schema",
+  "type": "object",
+  "properties": {
+    "solver": {
+      "type": "object",
+      "properties": {
+        "coordinateSystem": {
+          "type": "string",
+          "description": "Global coordinate system",
+          "enum": ["AXIS", "1D", "2D", "3D"]
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of solver",
+          "enum": ["transient","steady"]
+        },
+        "algorithm": {
+          "type": "string",
+          "default": "classical",
+          "description": "Type of algorithm for the solver",
+          "enum": ["classical", "quantum", "hybrid"]
+        },
+        "startTime":{
+          "type": "number"
+        },
+        "endTime":{
+          "type": "number"
+        },
+        "stoppingCriteria":{
+          "type": "number",
+          "description": "Convergence criteria for the problem defined by user {usually very small value << 1}"
+        },
+        "massMatrixType":{
+          "type":"boolean"
+        },
+        "theta":{
+          "type":"number",
+          "description": "Generalized alpha time discretization algorithm"
+        }
+      },
+      "required": [
+        "coordinateSystem",
+        "type",
+        "algorithm"
+      ]
+    },
+    "equation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "meshFile": {
+            "type": "string"
+          },
+          "meshField": {
+            "type": "string"
+          },
+          "materialPropertyName": {
+            "type": "string"
+          },
+          "feShape": {
+            "type": "string"
+          },
+          "gaussPoints": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "meshFile",
+          "meshField",
+          "materialPropertyName",
+          "feShape",
+          "gaussPoints"
+        ]
+      }
+    },
+    "materialProperty": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "youngsModulus": {
+            "type": "number"
+          },
+          "nu": {
+            "type": "number"
+          },
+          "rho": {
+            "type": "number"
+          },
+          "thickness": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "youngsModulus",
+          "nu",
+          "rho",
+          "thickness"
+        ]
+      }
+    }
+  },
+  "required": [
+    "solver",
+    "equation",
+    "materialProperty"
+  ]
+}
+

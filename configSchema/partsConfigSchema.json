@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parts user intputs JSON",
+  "type": "object",
+  "properties": {
+    "parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "A simple name identifier for the object of part class",
+            "type": "string"
+          },
+          "format": {
+            "description": "Currently supported format of the input mesh files.",
+            "type": "string",
+            "enum": ["gmsh"]
+          },
+          "meshFileName": {
+            "description": "Name of the mesh file along with correct extention",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "format",
+          "meshFileName"
+        ]
+      }
+    }
+  },
+  "required": [
+    "parts"
+  ]
+}
