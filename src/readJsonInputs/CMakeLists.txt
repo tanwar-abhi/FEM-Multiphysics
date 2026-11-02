@@ -6,8 +6,8 @@ set(readInputsCode
 )
 
 # Create a static library (*.so) of element code for linking with final executable
-add_library(inputsJson STATIC ${readInputsCode})
+add_library(jsonInputs STATIC ${readInputsCode})
 
 
 # Add directory to the current static shared library
-target_include_directories(inputsJson PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(jsonInputs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

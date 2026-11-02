@@ -42,7 +42,7 @@ class DirichletBC
     double value = 0;
 
     // array values (depend upon type of variables)
-    double values[3] = {0,0,0};
+    double values[3] = {0.0, 0.0 ,0.0};
 
     // Elemental Tag Id
     int elemTagId;

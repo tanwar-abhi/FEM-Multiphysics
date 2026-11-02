@@ -72,8 +72,9 @@ const std::unordered_map<std::string, EquationType> equationTypeMap = {
 };
 
 // convert shape function from string to enum value using lookup table
-static ElementShapeType lookUpElementShapeType(const std::string &s)
+static ElementShapeType lookUpElementShapeType(const std::string &shapeFn)
 {
+    std::string s = shapeFn;
     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
     auto it = shapeMap.find(s);
     if (it != shapeMap.end())
@@ -82,7 +83,7 @@ static ElementShapeType lookUpElementShapeType(const std::string &s)
 }
 
 // convert equation type from string to enum value using lookup table
-EquationType SolverInput::searchEquationType(const std::string& equationString)
+EquationType SolverInput::searchEquationType(std::string& equationString)
 {
     std::transform(equationString.begin(), equationString.end(), equationString.begin(), ::toupper);
     auto it = equationTypeMap.find(equationString);
@@ -123,16 +124,16 @@ bool SolverInput::readInputs(const std::string& inputFilePath)
     catch (const std::runtime_error& e)
     {
         result = false;
-        std::cerr<<"[Error] Caught Runtime exception : "<<e.what()<<std::endl;
+        std::cerr<<"[Error] SolverInput:readInputs::Caught Runtime exception : "<<e.what()<<std::endl;
     }
     catch (const std::exception& e)
     {
         result = false;
-        std::cerr<<"[Error] Caught Standard Exception : "<<e.what()<<std::endl;
+        std::cerr<<"[Error] SolverInput:readInputs::Caught Standard Exception : "<<e.what()<<std::endl;
     }
     catch (...) {
         result = false;
-        std::cerr << "[Error] Caught an unknown exception!" << std::endl;
+        std::cerr << "[Error] SolverInput:readInputs::Caught an unknown exception!" << std::endl;
     }
 
     return result;

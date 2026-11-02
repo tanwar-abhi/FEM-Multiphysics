@@ -36,9 +36,9 @@ enum class EquationType{
     Truss,
     Frame,
     Shell,
-    PlaneStress,
-    PlaneStrain,
-    LinearElastic3D,
+    PlaneStress, // 1 -> Linear Elastic (Plane Stress)
+    PlaneStrain, // 13-> Linear Elastic (Plane Strain)
+    LinearElastic3D, // 14 -> 3D Linear Elasticity
     HeatTransfer,
     TopologyOptimization,
     Axisymmetric2D,
@@ -92,7 +92,7 @@ class Equation
 
     // No. of Gauss Points {integration points} for each element
     int numberOfGaussPoints{0};
-    
+
     // Elemental Tag Id
     int elementTagId;
 
@@ -104,7 +104,7 @@ class Equation
     int ocType = 0;
 
     int penalization {0};
-    double filterRadius {0.0};
+    double filterRadius {0};
 };
 
 class SolverInput 
@@ -113,7 +113,7 @@ class SolverInput
     bool parseEquationsFromSolverJson(const std::string& solverJsonFile);
     bool parseSolverFromSolverJson(const std::string& solverJsonFile);
 
-    EquationType searchEquationType(const std::string& equationString);
+    EquationType searchEquationType(std::string& equationString);
 
     const std::string fileName = "solverConfig.json";
 
@@ -170,6 +170,8 @@ class SolverInput
     int getTotalEquations() const;
 
     bool getIsTransientSolver() const;
+
+    // void printSolverInput();
 };
 
 

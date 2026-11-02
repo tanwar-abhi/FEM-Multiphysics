@@ -3,7 +3,7 @@
 #include <eigen3/Eigen/Core>
 
 #include "solverInputs.hpp"
-#include "MaterialBase.hpp"
+#include "materialBase.hpp"
 
 
 enum class MaterialType
@@ -18,7 +18,7 @@ enum class MaterialType
 
 
 // Data structure to hold material properties of domain for Linear Elastic problems.
-class Solid : public MaterialBase<Solid>
+class Solid
 {
     public:
     // Default Constructor and Destructors
@@ -26,26 +26,26 @@ class Solid : public MaterialBase<Solid>
     ~Solid();
 
     // Inherit the constructior from Base class.
-    Solid(const std::string& inputsDirectoryPath) : MaterialBase(inputsDirectoryPath){};
+    Solid(const std::string& inputsDirectoryPath);
 
     Solid(const float& E, const float& NU, const double& density, const double& angularVelocity=0);
 
     // // Static function so that it can be used without an object, this function reads all material properties into a vector,
     // each element is a different material, defined by user in material input file
-    std::vector<Solid> readMaterialInputs();
+    // std::vector<Solid> readMaterialInputs();
 
     Eigen::MatrixXd HookesLawTensor(const EquationType& eqnType);
 
     MaterialType getMaterialType();
 
     // Thickness of the domain (only for 2D problems)
-    float thickness = 1.0;
+    double thickness = 1;
 
     // Young's modulus [E] in (Mpa)
-    float youngsModulus = 0.0;
+    double youngsModulus = 0;
 
     // Poisson's Ratio [Nu]
-    float poissonRatio = 0.0;
+    double poissonRatio = 0;
 
     // Angular velocity {only for Axisymmetric case}
     double omega = 0.0;

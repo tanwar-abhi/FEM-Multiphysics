@@ -31,6 +31,7 @@ class PartsInput {
 
     public:
     PartsInput();
+    PartsInput(const std::string& inputFilePath);
     ~PartsInput();
 
     void setNumberOfParts(int);
@@ -43,5 +44,7 @@ class PartsInput {
     std::vector<std::shared_ptr<Part>> parts;
 
     void readPartInputs(const std::string&);
+
+    void printPartInputs();
 };
 

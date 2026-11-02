@@ -32,6 +32,11 @@ PartsInput::PartsInput()
 //     parts = obj.parts;
 // }
 
+PartsInput::PartsInput(const std::string& inputPath)
+{
+    readPartInputs(inputPath + fileName);
+}
+
 PartsInput::~PartsInput()
 {
 
@@ -83,5 +88,16 @@ void PartsInput::readPartInputs(const std::string& filePath)
         part->meshFileName = tmp1;
 
         parts.emplace_back(part);
+    }
+}
+
+
+
+void PartsInput::printPartInputs()
+{
+    std::cout<<"Number of Parts = "<< getNumberOfParts()<<std::endl;
+    for (auto part : parts)
+    {
+        std::printf("Parts.name = %s\nParts.format = %s\nParts.meshFileName = %s\n", part->name.c_str() , part->format.c_str(), part->meshFileName.c_str());
     }
 }

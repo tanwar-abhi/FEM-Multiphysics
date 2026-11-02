@@ -1,4 +1,4 @@
-#include "MaterialBase.hpp"
+#include "materialBase.hpp"
 
 template<typename T>
 MaterialBase<T>::MaterialBase()

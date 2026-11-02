@@ -11,10 +11,8 @@ class MaterialBase
 {
     public:
     MaterialBase();
-    ~MaterialBase();
-    MaterialBase(const std::string& inputsDirectory) : 
-    _directoryInputs{inputsDirectory}{
-    }
+    virtual ~MaterialBase();
+    MaterialBase(const std::string& inputsDirectory) : _directoryInputs{inputsDirectory}{}
 
     void setName(const std::string& name);
     std::string getName() const;
@@ -26,7 +24,7 @@ class MaterialBase
 
     std::string getMaterialInputFileName() const;
 
-    virtual std::vector<T> readMaterialInputs() = 0;
+    // virtual std::vector<T> readMaterialInputs() = 0;
 
     private:
     // Directory containing input json files full path

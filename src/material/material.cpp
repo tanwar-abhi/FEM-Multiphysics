@@ -1,49 +1,125 @@
 
 #include "material.hpp"
-#include <cmath>
 
-
-
-
-
-
-// Returns Material's thermal conductivity tensor for Isotropic or anisotropic material
-Eigen::MatrixXd Material_HT(int dim, const double *k)
+Material::Material()
 {
-    // Thermal conductivity tensor of form [Kxx, Kxy; Kyx, Kyy]
-    Eigen::MatrixXd thermalConductivity(dim, dim);
+	// Default constructor of Material class
+}
 
-    if (dim == 2){
-        int nonZero = 0;
-        for (int i = 0; i < 4; i++){
-            if (k[i] != 0){
-                nonZero++;
-            }
-        }
-
-        // Isothermal material (one value of thermal conductivity)
-        if (nonZero == 1){
-            thermalConductivity.row(0) << k[0], 0;
-            thermalConductivity.row(1) << 0, k[0];
-        }
-        // Anisothermal material
-        else{
-            thermalConductivity.row(0) << k[0], k[1];
-            thermalConductivity.row(1) << k[2], k[3];
-        }
-    }
-    else if (dim == 3){
-        // Isothermal material (one value of thermal conductivity)
-        thermalConductivity.row(0) << k[0] , 0 , 0;
-        thermalConductivity.row(1) << 0 , k[0] , 0;
-        thermalConductivity.row(2) << 0 , 0 , k[0];
-    }
-
-    return thermalConductivity;
+Material::~Material()
+{
+	// Default Destructor
 }
 
 
 
+bool Material::hasSolid() const
+{
+	return solid.has_value();
+}
+
+bool Material::hasThermal() const
+{
+	return thermal.has_value();
+}
+
+
+
+
+/*
+// Read material data from JSON input files
+std::vector<Solid> Solid::readMaterialInputs()
+{
+    Solid material;
+    std::vector <Solid> materialVector;
+
+    const std::string solverInputJsonFile = getInputsDirectory() + getMaterialInputFileName();
+    std::ifstream mat_text(solverInputJsonFile);
+    Json::Value mat_root;
+    Json::Reader mat_reader;
+    bool parsingSuccessful = mat_reader.parse(mat_text, mat_root);
+
+    if(!parsingSuccessful)
+    {
+	    std::cerr << "[Error] Solid::readMaterialInputs : Error unable to parse the string" << std::endl;
+        std::runtime_error("Error unable to parse the string in Solid::readMaterialInputs");
+    }
+
+    const Json::Value materialJson = mat_root["materialProperty"];
+
+    // Temporary Variable used for reading inputs
+    std::string tmp;
+
+    if (materialJson.isArray())
+    {
+        for(int index = 0, n = materialJson.size(); index < n; index++)
+        {
+            if (materialJson[index].isMember("type") && materialJson[index]["type"].isString())
+            {
+                tmp = materialJson[index]["type"].asString();
+                material._materialType = lookUpMaterialType(tmp);
+            }
+    
+            if (materialJson[index].isMember("name") && materialJson[index]["name"].isString())
+            {
+                tmp = materialJson[index]["name"].asString();
+                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+                material.setName(tmp);
+            }
+    
+            if (materialJson[index].isMember("rho") && materialJson[index]["rho"].isDouble())
+            {
+                material.materialDensity = materialJson[index]["rho"].asDouble();
+            }
+
+            if (materialJson[index].isMember("nu") && materialJson[index]["nu"].isDouble())
+            {
+                material.poissonRatio = materialJson[index]["nu"].asDouble();
+            }
+
+            if (materialJson[index].isMember("thickness") && materialJson[index]["thickness"].isDouble())
+            {
+                material.thickness = materialJson[index]["thickness"].asDouble();
+            }
+
+            if (materialJson[index].isMember("youngsModulus") && materialJson[index]["youngsModulus"].isDouble())
+            {
+                material.youngsModulus = materialJson[index]["youngsModulus"].asDouble();
+            }
+
+            if (materialJson[index].isMember("angularVelocity") && materialJson[index]["angularVelocity"].isDouble())
+            {
+                material.omega = materialJson[index]["angularVelocity"].asDouble();
+            }
+
+            if (material.getMaterialType() != MaterialType::LinearElastic)
+            {
+                std::cerr<<"[ERROR] Solid::readMaterialInputs";
+                std::runtime_error("Material type is unavailable, currently only support LinearElastic materials");
+            }
+
+            // Eliminate user input error for thickness, or missing information
+            if (material.thickness <= 0)
+            {
+                material.thickness = 1;
+            }
+    
+            materialVector.emplace_back(material);
+        }
+    }
+    else{
+        std::runtime_error("[ERROR] Solid::readMaterialInputs solverConfig.json file does't contain materialProperty array." );
+    }
+
+    return materialVector;
+}
+*/
+
+
+
+
+
+/*
 std::vector<MaterialThermal> MaterialThermal::readMaterialInputs()
 {
 
@@ -51,17 +127,17 @@ std::vector<MaterialThermal> MaterialThermal::readMaterialInputs()
     MaterialThermal material;
 
     // Vector containing multiple material definations
-    std::vector<MaterialThermal> MaterialThermal_collection;
+    std::vector<MaterialThermal> vectorMaterialThermal;
 
-    std::ifstream mat_text(_directoryInputs + "solver.json");
-    Json::Value mat_root;
-    Json::Reader mat_reader;
-    bool parsingSuccessful = mat_reader.parse(mat_text, mat_root);
+    std::ifstream materialJsonFile(getInputsDirectory() + getMaterialInputFileName());
+    Json::Value materialRoot;
+    Json::Reader materialReader;
+    bool parsingSuccessful = materialReader.parse(materialJsonFile, materialRoot);
     if(!parsingSuccessful)
     {
         std::cout << "Error parsing the string" << std::endl;
     }
-    Json::Value inp_materialProp = mat_root["materialProperty"];
+    Json::Value inp_materialProp = materialRoot["materialProperty"];
 
     //Variable used for crosschecking if material type and equation type matches;
     std::string tmp;
@@ -94,22 +170,9 @@ std::vector<MaterialThermal> MaterialThermal::readMaterialInputs()
             material.thickness = 1;
         }
 
-        MaterialThermal_collection.push_back(material);
+        vectorMaterialThermal.push_back(material);
     }
 
-    return MaterialThermal_collection;
+    return vectorMaterialThermal;
 }
-
-
-
-void MaterialThermal::setInputDirectory(const std::string& directoryPath)
-{
-    _directoryInputs = directoryPath;
-}
-
-
-std::string MaterialThermal::getInputDirectory()
-{
-    return _directoryInputs;
-}
-
+*/
