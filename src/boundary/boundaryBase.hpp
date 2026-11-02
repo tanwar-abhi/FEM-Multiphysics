@@ -30,7 +30,7 @@ class BoundaryBase
     // Type of boundary Condition
     // 1=constant, 2=temporal, 3 = constant Nodal FileInput, 4 = temporal Nodal FileInput
     // int type {0};
-
+    BoundaryType type = BoundaryType::Unknown;
 
     // variable defined on this [dirichlet] boundary
     // This parameter can take “dispX”, “dispY”, “dispZ”, “velX”, “velY”, “velZ”, "temperature", "bodyForce", "fixed", "free"
@@ -41,7 +41,7 @@ class BoundaryBase
     // std::string variable;
 
     // Elemental Tag Id
-    int elementTagId;
+    int elementTagId {0};
 
     // name is a string, that will help to distinguish between multiple boundary conditions
     std::string name;

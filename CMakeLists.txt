@@ -15,8 +15,6 @@ message(STATUS "## C++17 standard selected")
 # Compile flag for optimisation or debugger
 # set(CMAKE_CXX_FLAGS "-O3")
 set(CMAKE_CXX_FLAGS "-g")
-# set(CMAKE_CXX_FLAGS "-O3")
-set(CMAKE_CXX_FLAGS "-g")
 
 # Pthread library for multithreading 
 find_package(Threads)
@@ -49,9 +47,9 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 
 target_link_libraries(${PROJECT_NAME} JsonCpp::JsonCpp)
-target_link_libraries(${PROJECT_NAME} inputsJson)
+target_link_libraries(${PROJECT_NAME} jsonInputs)
+target_link_libraries(${PROJECT_NAME} materialsProperty)
 # target_link_libraries(${PROJECT_NAME} element)
 # target_link_libraries(${PROJECT_NAME} postProcessing)
 # target_link_libraries(${PROJECT_NAME} preProcessing)
 # target_link_libraries(${PROJECT_NAME} srcFunction)
-target_link_libraries(${PROJECT_NAME} materialsProperty)

@@ -1,5 +1,8 @@
 
 add_subdirectory(readJsonInputs)
+add_subdirectory(material)
+
+
 
 # set(mpsSRCCode
 # 	boundary_HT.cpp 		boundary_HT.hpp

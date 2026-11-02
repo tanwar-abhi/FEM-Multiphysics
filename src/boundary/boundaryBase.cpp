@@ -12,7 +12,16 @@ BoundaryBase::~BoundaryBase()
 
 }
 
+const std::unordered_map<std::string, BoundaryType> boundaryTypeMap = {
+    {"CONSTANT", BoundaryType::Constant},
+    {"TEMPORAL", BoundaryType::Temporal},
+    {"CONSTANTNODALFILEINPUT", BoundaryType::ConstantNodalFileInput},
+    {"TEMPORALNODALFILEINPUT", BoundaryType::TemporalNodalFileInput},
+    {"UNKNOWN", BoundaryType::Unknown}
+};
 
 
-const std::unordered_map<std::string, EquationType> equationTypeMap = {
+BoundaryType BoundaryBase::getBoundaryType()
+{
+    
 }
