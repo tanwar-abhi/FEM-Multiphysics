@@ -23,7 +23,8 @@
           "enum": ["classical", "quantum", "hybrid"]
         },
         "startTime":{
-          "type": "number"
+          "type": "number",
+          "default": 0
         },
         "endTime":{
           "type": "number"
@@ -67,10 +68,14 @@
             "type": "string"
           },
           "feShape": {
-            "type": "string"
+            "description": "Type of finite element selected by user for descretization of the domain",
+            "type": "string",
+            "enum": ["2NodeRod", "3NodeRod", "3NodeTri", "6NodeTri", "4NodeQuad", "9NodeQuad", "8NodeHexa"]
           },
           "gaussPoints": {
-            "type": "integer"
+            "description": "Number of gauss points for each element",
+            "type": "integer",
+            "default": 1
           }
         },
         "required": [
@@ -113,8 +118,7 @@
           "type",
           "youngsModulus",
           "nu",
-          "rho",
-          "thickness"
+          "rho"
         ]
       }
     }
