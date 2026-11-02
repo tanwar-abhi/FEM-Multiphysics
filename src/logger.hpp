@@ -19,7 +19,6 @@ class Logger
     LogLevel logLevel = LogLevel::info;
     std::string logLevelStr = "INFO";
 
-
     std::string logFileName = "logFile.txt";
 
     public:

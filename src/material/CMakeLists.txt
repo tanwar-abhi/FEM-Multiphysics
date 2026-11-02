@@ -1,6 +1,7 @@
 
 set(materialsDefinition
-    materialBase.cpp    materialBase.hpp
+    # materialBase.cpp    materialBase.hpp
+    material.cpp        material.hpp
     solid.cpp           solid.hpp
     thermal.cpp         thermal.hpp
 )

@@ -59,4 +59,6 @@ class Solid
     MaterialType _materialType = MaterialType::Unknown;
 
     MaterialType lookUpMaterialType(const std::string& materialString);
+
+    static std::vector<Solid> readMaterialInputs()
 };

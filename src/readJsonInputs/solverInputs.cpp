@@ -147,7 +147,7 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
     std::cout<<"[Debug] SolverInput::parseEquationFromSolverJson path solverJsonFile = "<<jsonFileFullPath + fileName<<std::endl;
 
     if (!solverJsonFile.is_open()){
-        std::runtime_error("[Error] SolverInput::parseEquationsFromSolverJson :: could not open solver input file");
+        throw std::runtime_error("[Error] SolverInput::parseEquationsFromSolverJson :: could not open solver input file");
     }
 
     Json::Value solverInput;
