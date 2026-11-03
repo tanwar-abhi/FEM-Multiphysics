@@ -1,0 +1,5 @@
+g++ : 'recomended version 17 (minimum 11)'
+cmake
+eigen3.3 : 'Libraries/eigen3.3'
+libjsoncpp
+spdlog : 'version 1.17' : 'Libraries/spdlog'

@@ -2,19 +2,19 @@
 #include "thermal.hpp"
 
 
-MaterialThermal::MaterialThermal()
+Thermal::Thermal()
 {
-    std::cout<<"[INFO] intialized thermal material constructor\n";
+    spdlog::debug("Thermal::Thermal intialized thermal material constructor");
 }
 
 
-MaterialThermal::~MaterialThermal()
+Thermal::~Thermal()
 {
-
+    spdlog::debug("Thermal::~Thermal destructor called");
 }
 
 
-Eigen::MatrixXd MaterialThermal::getMaterialThermalConductivity(const int& dimension)
+Eigen::MatrixXd Thermal::getThermalConductivity(const int& dimension)
 {
     Eigen::MatrixXd thermalConductivityMatrix(dimension, dimension);
 
@@ -47,17 +47,97 @@ Eigen::MatrixXd MaterialThermal::getMaterialThermalConductivity(const int& dimen
     return thermalConductivityMatrix;
 }
 
+const std::unordered_map<std::string, ThermalMaterialType> thermalMaterialMap = 
+{
+    {"INSULATOR", ThermalMaterialType::Insulator},
+    {"CONDUCTOR", ThermalMaterialType::Conductor},
+    {"THERMAL", ThermalMaterialType::Thermal},
+    {"ISOTROPIC", ThermalMaterialType::Isotropic},
+    {"ANISOTROPIC", ThermalMaterialType::Anisotropic},
+    {"UNKNONW", ThermalMaterialType::Unknown}
+};
 
 
+void Thermal::lookUpMaterialType(const std::string& materialTypeJson)
+{
+    auto it = thermalMaterialMap.find(materialTypeJson);
+    if (it != thermalMaterialMap.end())
+    {
+        _materialType = it->second;
+        spdlog::info("Thermal material lookup resulted in material type = {}", it->first);
+    }
+    else {
+        spdlog::critical("Thermal::lookUpMaterialType counld't find defined material type in the lookup table.");
+        std::runtime_error("Material type = " + materialTypeJson + " is not found in the lookup table.");
+    }
+}
 
-std::vector<std::optional<MaterialThermal>> MaterialThermal::readMaterialInputs()
+
+void Thermal::readThermalMaterialInputs(const Json::Value& materialJson, std::vector<Thermal>& vectorThermal)
 {
 
     // Temporary object to read material properties defined in material input file
-    std::optional<MaterialThermal> material;
+    Thermal material;
+
+    //Variable used for cross checking if material type and equation type matches;
+    std::string tmp;
+
+    tmp = materialJson["type"].asString();
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+    material.lookUpMaterialType(tmp);
+
+    // Thermal conductivity is of form [Kxx, Kxy, Kyx, Kyy] for anisotropic material
+    if (material._materialType == ThermalMaterialType::Anisotropic)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            material.thermalConductivity2D[i] = materialJson["thermalConductivity"][i].asDouble();
+        }
+    }
+    else
+    {
+        material.thermalConductivity3D[0] = materialJson["thermalConductivity"].asDouble();
+    }
+
+    if (materialJson.isMember("name") && materialJson["name"].isString())
+    {
+        tmp = materialJson["name"].asString();
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+        material._name = tmp;
+    }
+
+    if (materialJson.isMember("rho") && materialJson["rho"].isDouble())
+    {
+        material.massDensity = materialJson["rho"].asDouble();
+    }
+
+    if (materialJson.isMember("specificHeat") && materialJson["specificHeat"].isDouble())
+    {
+        material.specificHeat = materialJson["specificHeat"].asDouble();
+    }
+
+    material.thickness = materialJson["thickness"].asDouble();
+
+    // Eliminate user input error for thickness
+    if (material.thickness <= 0){
+        material.thickness = 1;
+        spdlog::info("Thermal::readThermalMaterialInputs detected incorrect material thickness {}", material.thickness);
+    }
+
+    vectorThermal.emplace_back(material);
+}
+
+
+
+/*
+void Thermal::readThermalMaterialInputs()
+{
+
+    // Temporary object to read material properties defined in material input file
+    std::optional<Thermal> material;
 
     // Vector containing multiple material definations
-    std::vector<std::optional<MaterialThermal>> vectorMaterialThermal;
+    std::vector<std::optional<Thermal>> vectorThermal;
 
     std::ifstream materialJsonFile(getInputsDirectory() + getMaterialInputFileName());
     Json::Value materialRoot;
@@ -100,8 +180,9 @@ std::vector<std::optional<MaterialThermal>> MaterialThermal::readMaterialInputs(
             material.thickness = 1;
         }
 
-        vectorMaterialThermal.push_back(material);
+        vectorThermal.push_back(material);
     }
 
-    return vectorMaterialThermal;
+    return vectorThermal;
 }
+*/

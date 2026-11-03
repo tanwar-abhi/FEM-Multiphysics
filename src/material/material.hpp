@@ -1,22 +1,23 @@
 
 #pragma once
 
-#include <solid.hpp>
-#include <thermal.hpp>
+#include "solid.hpp"
+#include "thermal.hpp"
 
 #include <optional>
 
 
-class Material : public Solid, public MaterialThermal 
+// class Material : public Solid, public MaterialThermal 
+class Material
 {
 	public:
 		Material();
 		~Material();
 
-		Material(const std::sting& inputDirectory) : _directoryInputs{inputDirectory} {};
+		Material(const std::string& inputDirectory) : _directoryInputs{inputDirectory} {};
 
-		std::vector<std::optional<Solid>> solid;
-		std::vector<std::optional<MaterialThermal>> thermal;
+		std::vector<Solid> solid;
+		std::vector<Thermal> thermal;
 
 		bool hasSolid() const;
 		bool hasThermal() const;
@@ -28,6 +29,7 @@ class Material : public Solid, public MaterialThermal
 		int getElementTagId() const;
 
 		std::string getInputsDirectory() const;
+		void setInputsDirectory(const std::string& inputsDir);
 
 		std::string getMaterialInputFileName() const;
 
@@ -45,5 +47,7 @@ class Material : public Solid, public MaterialThermal
 
 		// file name that contains material inputs
 		const std::string _materialInputFileName = "solverConfig.json";
+
+		void readMaterialProperty(const Json::Value &materialJson);
 
 };

@@ -4,6 +4,7 @@
 
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/value.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
 #include <algorithm>
@@ -161,7 +162,7 @@ class SolverInput
 
     // Type of mass matrix
     // 0-> Lumped Mass matrix ; 1-> Consistent Mass Matrix
-    int massMatrixType;
+    int massMatrixType{0};
 
     std::vector<std::shared_ptr<Equation>> equations;
 

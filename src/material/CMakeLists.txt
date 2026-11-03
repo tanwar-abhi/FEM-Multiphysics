@@ -1,6 +1,5 @@
 
 set(materialsDefinition
-    # materialBase.cpp    materialBase.hpp
     material.cpp        material.hpp
     solid.cpp           solid.hpp
     thermal.cpp         thermal.hpp
@@ -13,5 +12,5 @@ add_library(materialsProperty STATIC ${materialsDefinition})
 # Add directory to the current static shared library
 target_include_directories(materialsProperty PUBLIC ${CMAKE_SOURCE_DIR}/src/readJsonInputs)
 target_include_directories(materialsProperty PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-# target_include_directories(materialsProperty PUBLIC ${CMAKE_SOURCE_DIR}/Libraries/eigen3.3)
+target_include_directories(materialsProperty PUBLIC ${CMAKE_SOURCE_DIR}/Libraries/eigen3.3)
 

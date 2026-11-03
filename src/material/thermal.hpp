@@ -4,20 +4,39 @@
 
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/json.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <optional>
 
-#include "materialBase.hpp"
+// #include "materialBase.hpp"
+
+
+enum class ThermalMaterialType
+{
+    Insulator,
+    Conductor,
+    Thermal,
+    Isotropic,
+    Anisotropic,
+    Unknown
+};
 
 // Data structure to hold material properties of domain for heat transfer problem.
-class MaterialThermal
+class Thermal
 {
+    private:
+    std::string _name;
+    ThermalMaterialType _materialType = ThermalMaterialType::Unknown;
+
+    void lookUpMaterialType(const std::string& materialType);
+
     public:
     // Default Constructor and Destructors
-    MaterialThermal();
-    ~MaterialThermal();
+    Thermal();
+    ~Thermal();
 
     // Thickness of domain (element) to be defined for 2D cartesian coordinate problem only {units : m}
     // NOTE -> Never set thickness = 0, by default value of thickenss = 1
@@ -38,11 +57,11 @@ class MaterialThermal
     double thermalConductivity3D[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Static function can be used without object, reads all material properties for Heat Transfer defined in inputs file
-    // std::vector<MaterialThermal> readMaterialInputs();
+    static void readThermalMaterialInputs(const Json::Value& materialConfigJson, std::vector<Thermal>& thermalVector);
 
     // void setInputDirectory(const std::string& inputJsonDirectory);
 
     // std::string getInputDirectory();
 
-    Eigen::MatrixXd getMaterialThermalConductivity(const int& dimension);
+    Eigen::MatrixXd getThermalConductivity(const int& dimension);
 };

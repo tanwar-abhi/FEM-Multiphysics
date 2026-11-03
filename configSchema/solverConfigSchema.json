@@ -56,7 +56,10 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "description": "Equation type that is to be solved",
+            "type": "string",
+            "enum": ["beam","plate","truss","frame","shell","PlaneStress", "PlainStrain",
+                     "LinearElastic3D", "HeatTransfer", "TopologyOptimization", "Axisymmetric2D"]
           },
           "meshFile": {
             "type": "string"
@@ -97,14 +100,21 @@
           "name": {
             "type": "string"
           },
+          "category":{
+            "type": "string",
+            "description": "Category of material property , currently only accepts solid, thermal to distinguish which material class to be loaded",
+            "enum": ["solid", "thermal"]
+          },
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "Type of the material",
           },
           "youngsModulus": {
             "type": "number"
           },
           "nu": {
-            "type": "number"
+            "type": "number",
+            "description": "Poison's ratio of the material"
           },
           "rho": {
             "type": "number"
@@ -116,9 +126,7 @@
         "required": [
           "name",
           "type",
-          "youngsModulus",
-          "nu",
-          "rho"
+          "category"
         ]
       }
     }

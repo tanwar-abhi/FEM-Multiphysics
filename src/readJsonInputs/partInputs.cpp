@@ -54,7 +54,7 @@ const int PartsInput::getNumberOfParts()
 
 void PartsInput::readPartInputs(const std::string& filePath)
 {
-    std::cout<<"current filepath = " << filePath + fileName <<std::endl;
+    spdlog::debug("PartsInput::readPartInputs current filepath = {}", filePath + fileName);
 
     std::ifstream partsJsonFile(filePath + fileName);
     Json::Reader partsReader;

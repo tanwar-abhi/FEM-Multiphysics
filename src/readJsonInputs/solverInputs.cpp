@@ -110,14 +110,16 @@ bool SolverInput::readInputs(const std::string& inputFilePath)
             result = parseSolverFromSolverJson(inputFilePath);
             if (!result)
             {
-                std::cout<<"[Error] Failed to parse solver details from sovlerInputs json file.\n";
+                // std::cout<<"[Error] Failed to parse solver details from sovlerInputs json file.\n";
+                spdlog::critical("SolverInput::readInputs Failed to parse solver details from sovlerInputs json file.");
                 return result;
             }
             std::cout << "done reading the solver input file" << std::endl;
         }
         else
         {
-            std::cout<<"[Error] Failed to parse Equations details from sovlerInputs json file.\n";
+            // std::cout<<"[Error] Failed to parse Equations details from sovlerInputs json file.\n";
+            spdlog::critical("SolverInput::readInputs Failed to parse Equations details from sovlerInputs json file.");
             return result;
         }
     }
@@ -144,7 +146,7 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
 {
     std::ifstream solverJsonFile(jsonFileFullPath + fileName);
 
-    std::cout<<"[Debug] SolverInput::parseEquationFromSolverJson path solverJsonFile = "<<jsonFileFullPath + fileName<<std::endl;
+    spdlog::debug("SolverInput::parseEquationFromSolverJson path solverJsonFile = {}", jsonFileFullPath + fileName);
 
     if (!solverJsonFile.is_open()){
         throw std::runtime_error("[Error] SolverInput::parseEquationsFromSolverJson :: could not open solver input file");
@@ -239,9 +241,9 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
                     eqn->ocType = equationInput[index]["ocType"].asInt();
                 }
             }
-            std::cout<<equations.size()<<"\n";
             equations.emplace_back(eqn);
-            // std::cout<<"after emplace_back"<<equations.size()<<"\n";x
+            spdlog::debug("SolverInput::parseEquationFromSolverJson after emplace_back equation.size = {}", equations.size());
+            // std::cout<<"after emplace_back"<<equations.size()<<"\n";
             equationReadingResult = true;
         }
     }
@@ -321,7 +323,7 @@ bool SolverInput::parseSolverFromSolverJson(const std::string& jsonFileFullPath)
         // else if (tmp == "STEADY" || tmp == "STEADYSTATE" || tmp == "STEADY_STATE")
         else if (solverType == SolverType::Steady)
         {
-            std::cout << "The solver is steady state" << std::endl;
+            spdlog::debug("The Solver is steady state.");
             isTransient = false;
         }
         else {
@@ -344,10 +346,13 @@ bool SolverInput::parseSolverFromSolverJson(const std::string& jsonFileFullPath)
     else if (coordinateSystem == "3D")
         dimension = 3;
     else{
+        spdlog::error("SovlerInput::parseSolverFromSolverJson Dimension Invalid Coordinate System selected");
         std::runtime_error("[Error] SovlerInput::parseSolverFromSolverJson Dimension Invalid Coordinate System selected");
     }
 
-    std::cout<<"CoordinateSystem ="<<coordinateSystem<<" ; Dimension ="<<dimension<<std::endl;
+    // std::cout<<"CoordinateSystem ="<<coordinateSystem<<" ; Dimension ="<<dimension<<std::endl;
+    spdlog::debug("CoordinateSystem = {} ; Dimension = {}", coordinateSystem, dimension);
+
     // // Algorithm Selection
     // // 1 -> classical ; 2 -> Hybrid {Quantum + classical}; 3 -> Only Quantum
     // tmp = inputSolver["algorithm"].asString();
