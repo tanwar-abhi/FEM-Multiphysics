@@ -123,12 +123,12 @@ Eigen::MatrixXd Solid::HookesLawTensor(const EquationType& equationType)
 
 
 // Read material data from JSON input files
-std::vector<std::optional<Solid>> Solid::readMaterialInputs()
+std::vector<std::optional<Solid>> Solid::readMaterialInputs(std::optional<std::string> inputsDirectory = std::nullopt)
 {
     std::optional<Solid> material;
     std::vector<std::optional<Solid>> materialVector;
 
-    const std::string solverInputJsonFile = getInputsDirectory() + getMaterialInputFileName();
+    const std::string solverInputJsonFile = inputsDirectory + getMaterialInputFileName();
     std::ifstream mat_text(solverInputJsonFile);
     Json::Value mat_root;
     Json::Reader mat_reader;

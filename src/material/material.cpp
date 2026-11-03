@@ -12,7 +12,7 @@ Material::~Material()
 
 bool Material::hasSolid() const
 {
-    retrun solid[0].has_value();
+    return solid[0].has_value();
 }
 
 bool Material::hasThermal() const
@@ -20,12 +20,12 @@ bool Material::hasThermal() const
 	return thermal[0].has_value();
 }
 
-std::string Material::getMaterialInputFileName()
+std::string Material::getMaterialInputFileName() const
 {
     return _materialInputFileName;
 }
 
-std::string Material::getInputsDirectory()
+std::string Material::getInputsDirectory() const
 {
     return _directoryInputs;
 }
@@ -44,7 +44,7 @@ bool Material::readMaterialInputs()
     }
     catch(const std::exception& e)
     {
-        std::cerr<<"" << e.what() << '\n';
+        std::cerr<<"[ERROR] Material::readMaterialInputs std exception = " << e.what() << '\n';
     }
     
     return result;

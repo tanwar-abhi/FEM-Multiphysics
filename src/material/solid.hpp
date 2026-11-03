@@ -1,10 +1,11 @@
 #pragma once
 
-#include <eigen3/Eigen/Core>
-
 #include "solverInputs.hpp"
 #include "materialBase.hpp"
 
+#include <eigen3/Eigen/Core>
+
+#include <optional>
 
 enum class MaterialType
 {
@@ -60,5 +61,5 @@ class Solid
 
     MaterialType lookUpMaterialType(const std::string& materialString);
 
-    static std::vector<Solid> readMaterialInputs()
+    static std::vector<std::optional<Solid>> readMaterialInputs();
 };

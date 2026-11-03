@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 # Set Project name (executable will be of same name)
-project(simulationMPS VERSION 0.5 LANGUAGES C CXX)
+project(simulationMPS VERSION 0.8 LANGUAGES C CXX)
 
 # Path where executable will be generated (Optional, otherise will be in build folder)
 # set(EXECUTABLE_OUTPUT_PATH ../)
@@ -42,6 +42,23 @@ add_subdirectory(src)
 # message(STATUS "## Treat all warnings as errors")
 
 
+find_package(spdlog 1.17 QUIET)
+if (spdlog_FOUND)
+    message(STATUS "## spdlog logger library found")
+
+elseif(NOT spdlog_FOUND)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.17.0 # pin a release tag never a branch
+        GIT_SHALOW     TRUE
+    )
+
+    FetchContent_MakeAvailable(spdlog)
+endif()
+
 # Create executable
 add_executable(${PROJECT_NAME} main.cpp)
 
@@ -53,3 +70,6 @@ target_link_libraries(${PROJECT_NAME} materialsProperty)
 # target_link_libraries(${PROJECT_NAME} postProcessing)
 # target_link_libraries(${PROJECT_NAME} preProcessing)
 # target_link_libraries(${PROJECT_NAME} srcFunction)
+
+# Link your executable to spdlog : This automatically handles include directories and compiler flags
+target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
