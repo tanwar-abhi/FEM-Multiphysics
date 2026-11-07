@@ -4,6 +4,7 @@
 
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/value.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
 #include <algorithm>

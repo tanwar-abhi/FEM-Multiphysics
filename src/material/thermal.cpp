@@ -49,7 +49,7 @@ Eigen::MatrixXd MaterialThermal::getMaterialThermalConductivity(const int& dimen
 
 
 
-
+/*
 std::vector<std::optional<MaterialThermal>> MaterialThermal::readMaterialInputs()
 {
 
@@ -105,3 +105,4 @@ std::vector<std::optional<MaterialThermal>> MaterialThermal::readMaterialInputs(
 
     return vectorMaterialThermal;
 }
+*/

@@ -9,42 +9,44 @@ Solid::~Solid() {
 
 }
 
-Solid::Solid(const float& E, const float& NU, const double& RHO, const double& angularVelocity=0)
-{
-    youngsModulus = E;
-    poissonRatio = NU;
-    materialDensity = RHO;
-    if (angularVelocity != 0)
-    {
-        omega = angularVelocity;
-    }
-}
+// Solid::Solid(const float& E, const float& NU, const double& RHO, const double& angularVelocity=0)
+// {
+//     youngsModulus = E;
+//     poissonRatio = NU;
+//     materialDensity = RHO;
+//     if (angularVelocity != 0)
+//     {
+//         omega = angularVelocity;
+//     }
+// }
 
 
 
-const std::unordered_map<std::string, MaterialType> materialMap = {
-    {"LINEARELASTIC", MaterialType::LinearElastic},
-    {"HYPERELASTIC", MaterialType::Hyperelastic},
-    {"NONLINEAR", MaterialType::NonLinear},
-    {"ELASTOPLASTIC", MaterialType::ElastoPlastic},
-    {"VISCOPLASTICITY", MaterialType::Viscoplasticity},
-    {"UNKNOWN", MaterialType::Unknown}
+const std::unordered_map<std::string, SolidMaterialType> materialMap = {
+    {"LINEARELASTIC", SolidMaterialType::LinearElastic},
+    {"HYPERELASTIC", SolidMaterialType::Hyperelastic},
+    {"NONLINEAR", SolidMaterialType::NonLinear},
+    {"ELASTOPLASTIC", SolidMaterialType::ElastoPlastic},
+    {"VISCOPLASTICITY", SolidMaterialType::ViscoElastic},
+    {"VISCOELASTIC", SolidMaterialType::ViscoPlastic},
+    {"UNKNOWN", SolidMaterialType::Unknown}
 };
 
 
 
-MaterialType Solid::lookUpMaterialType(const std::string& materialFromJson)
+void Solid::lookUpMaterialType(const std::string& materialFromJson)
 {
-    std::transform(materialFromJson.begin(), materialFromJson.end(), materialFromJson.begin(), ::toupper);
-    auto it = materialMap.find(materialFromJson);
+    std::string tmp = materialFromJson;
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+    auto it = materialMap.find(tmp);
     if (it != materialMap.end()){
-        return it->second;
+        _materialType = it->second;
     }
     std::cout<<"[debug] Solid::lookUpMaterialType material type is not found in lookup table.\n";
-    return MaterialType::Unknown;
+    _materialType = SolidMaterialType::Unknown;
 }
 
-MaterialType Solid::getMaterialType()
+SolidMaterialType Solid::getMaterialType()
 {
     return _materialType;
 }
@@ -123,12 +125,12 @@ Eigen::MatrixXd Solid::HookesLawTensor(const EquationType& equationType)
 
 
 // Read material data from JSON input files
-std::vector<std::optional<Solid>> Solid::readMaterialInputs(std::optional<std::string> inputsDirectory = std::nullopt)
+void Solid::readSolidMaterialInputs(const std::string& inputsDirectoryWithFileName, std::vector<std::optional<Solid>>& materialVector)
 {
     std::optional<Solid> material;
-    std::vector<std::optional<Solid>> materialVector;
+    // std::vector<std::optional<Solid>> materialVector;
 
-    const std::string solverInputJsonFile = inputsDirectory + getMaterialInputFileName();
+    const std::string solverInputJsonFile = inputsDirectoryWithFileName;
     std::ifstream mat_text(solverInputJsonFile);
     Json::Value mat_root;
     Json::Reader mat_reader;
@@ -152,51 +154,52 @@ std::vector<std::optional<Solid>> Solid::readMaterialInputs(std::optional<std::s
             if (materialJson[index].isMember("type") && materialJson[index]["type"].isString())
             {
                 tmp = materialJson[index]["type"].asString();
-                material._materialType = lookUpMaterialType(tmp);
+                // material->_materialType = lookUpMaterialType(tmp);
+                material->lookUpMaterialType(tmp);
             }
     
-            if (materialJson[index].isMember("name") && materialJson[index]["name"].isString())
-            {
-                tmp = materialJson[index]["name"].asString();
-                std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
-                material.setName(tmp);
-            }
+            // if (materialJson[index].isMember("name") && materialJson[index]["name"].isString())
+            // {
+            //     tmp = materialJson[index]["name"].asString();
+            //     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+            //     material->setName(tmp);
+            // }
     
             if (materialJson[index].isMember("rho") && materialJson[index]["rho"].isDouble())
             {
-                material.materialDensity = materialJson[index]["rho"].asDouble();
+                material->materialDensity = materialJson[index]["rho"].asDouble();
             }
 
             if (materialJson[index].isMember("nu") && materialJson[index]["nu"].isDouble())
             {
-                material.poissonRatio = materialJson[index]["nu"].asDouble();
+                material->poissonRatio = materialJson[index]["nu"].asDouble();
             }
 
             if (materialJson[index].isMember("thickness") && materialJson[index]["thickness"].isDouble())
             {
-                material.thickness = materialJson[index]["thickness"].asDouble();
+                material->thickness = materialJson[index]["thickness"].asDouble();
             }
 
             if (materialJson[index].isMember("youngsModulus") && materialJson[index]["youngsModulus"].isDouble())
             {
-                material.youngsModulus = materialJson[index]["youngsModulus"].asDouble();
+                material->youngsModulus = materialJson[index]["youngsModulus"].asDouble();
             }
 
             if (materialJson[index].isMember("angularVelocity") && materialJson[index]["angularVelocity"].isDouble())
             {
-                material.omega = materialJson[index]["angularVelocity"].asDouble();
+                material->omega = materialJson[index]["angularVelocity"].asDouble();
             }
 
-            if (material.getMaterialType() != MaterialType::LinearElastic)
+            if (material->getMaterialType() != SolidMaterialType::LinearElastic)
             {
                 std::cerr<<"[ERROR] Solid::readMaterialInputs";
                 std::runtime_error("Material type is unavailable, currently only support LinearElastic materials");
             }
 
             // Eliminate user input error for thickness, or missing information
-            if (material.thickness <= 0)
+            if (material->thickness <= 0)
             {
-                material.thickness = 1;
+                material->thickness = 1;
             }
     
             materialVector.emplace_back(material);
@@ -205,6 +208,4 @@ std::vector<std::optional<Solid>> Solid::readMaterialInputs(std::optional<std::s
     else{
         std::runtime_error("[ERROR] Solid::readMaterialInputs solverConfig.json file does't contain materialProperty array." );
     }
-
-    return materialVector;
 }

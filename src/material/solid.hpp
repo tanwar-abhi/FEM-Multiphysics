@@ -3,17 +3,18 @@
 #include "solverInputs.hpp"
 #include "materialBase.hpp"
 
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 
 #include <optional>
 
-enum class MaterialType
+enum class SolidMaterialType
 {
     LinearElastic,
     Hyperelastic,
     NonLinear,
     ElastoPlastic,
-    Viscoplasticity,
+    ViscoPlastic,
+    ViscoElastic,
     Unknown
 };
 
@@ -29,7 +30,7 @@ class Solid
     // Inherit the constructior from Base class.
     Solid(const std::string& inputsDirectoryPath);
 
-    Solid(const float& E, const float& NU, const double& density, const double& angularVelocity=0);
+    // Solid(const float& E, const float& NU, const double& density, const double& angularVelocity=0);
 
     // // Static function so that it can be used without an object, this function reads all material properties into a vector,
     // each element is a different material, defined by user in material input file
@@ -37,7 +38,9 @@ class Solid
 
     Eigen::MatrixXd HookesLawTensor(const EquationType& eqnType);
 
-    MaterialType getMaterialType();
+    SolidMaterialType getMaterialType();
+
+    static void readSolidMaterialInputs(const std::string& inputsDirectoryPath, std::vector<std::optional<Solid>>& solidVector);
 
     // Thickness of the domain (only for 2D problems)
     double thickness = 1;
@@ -57,9 +60,8 @@ class Solid
     private:
 
     // Type of the material
-    MaterialType _materialType = MaterialType::Unknown;
+    SolidMaterialType _materialType = SolidMaterialType::Unknown;
 
-    MaterialType lookUpMaterialType(const std::string& materialString);
+    void lookUpMaterialType(const std::string& materialString);
 
-    static std::vector<std::optional<Solid>> readMaterialInputs();
 };

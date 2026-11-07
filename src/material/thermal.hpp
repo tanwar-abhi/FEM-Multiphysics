@@ -8,15 +8,31 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <optional>
 
 #include "materialBase.hpp"
+
+
+enum class ThermalMaterialType
+{
+    Insulator,
+    Conductor,
+    Thermal,
+    Isotropic,
+    Anisotropic,
+    Unknown
+};
 
 // Data structure to hold material properties of domain for heat transfer problem.
 class MaterialThermal
 {
+    private:
+    ThermalMaterialType _materialType = ThermalMaterialType::Unknown;
+
     public:
     // Default Constructor and Destructors
     MaterialThermal();
+    MaterialThermal(const std::string& inputsDirectoryPath);
     ~MaterialThermal();
 
     // Thickness of domain (element) to be defined for 2D cartesian coordinate problem only {units : m}
@@ -38,7 +54,7 @@ class MaterialThermal
     double thermalConductivity3D[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Static function can be used without object, reads all material properties for Heat Transfer defined in inputs file
-    // std::vector<MaterialThermal> readMaterialInputs();
+    static std::vector<std::optional<MaterialThermal>> readMaterialInputs();
 
     // void setInputDirectory(const std::string& inputJsonDirectory);
 

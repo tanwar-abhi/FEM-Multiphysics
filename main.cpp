@@ -13,21 +13,23 @@
 
 #include "partInputs.hpp"
 #include "solverInputs.hpp"
-#include "solid.hpp"
-#include "thermal.hpp"
+#include "material.hpp"
 
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
 // Incase we wish to export the logs to a file we can use the sink/basic_file_sink.h
-#include <spdlog/sinks/basic_file_sink.h>
+// #include <spdlog/sinks/basic_file_sink.h>
 
 #include <iomanip>
 #include <string>
 #include <filesystem>
+#include <cstdlib>
+
+void setSpdLogLevel(const std::string& envLogLevel);
 
 int main()
 {
 
-    spdlog::set_level(spdlog::level::debug);
+    setSpdLogLevel("LOG_LEVEL");
 
     spdlog::info("Starting Multiphysics Simulator");
     const std::string inputsPath = std::filesystem::current_path().string() + "/sampleInputs/";
@@ -43,17 +45,15 @@ int main()
     SolverInput solverInput;
     if (!solverInput.readInputs(inputsPath))
     {
-        std::cout<<"[ERROR] (main) solver Inputs parsing failed\n";
+        spdlog::critical("(main) solver Inputs parsing failed");
         return -2;
     }
-
-    
 
 
     // // LinearElasticMaterial solid(inputsPath);
     // std::vector<Solid> materialsSolid(inputsPath);
     // std::vector<MaterialThermal> materialsThermal(inputsPath);
-    
+
 
     // // Read Material properties based on the equations defined in user input files
     // for (int i = 0; i < solverInput.getTotalEquations(); i++)
@@ -67,9 +67,34 @@ int main()
     //         }
     // }
 
-
-
-
     return 0;
 }
 
+
+
+void setSpdLogLevel(const std::string& envVariable)
+{
+    char* envLogLevel = std::getenv(envVariable.c_str());
+
+    if (envLogLevel != nullptr)
+    {
+        std::string logLevel(envLogLevel);
+        std::transform(logLevel.begin(), logLevel.end(), logLevel.begin(), ::toupper);
+        std::cout<<"env variable logLevel defined = "<<logLevel<<std::endl;
+
+        if (logLevel == "DEBUG") {
+            spdlog::set_level(spdlog::level::debug);
+        }
+        else if (logLevel == "TRACE") {
+            spdlog::set_level(spdlog::level::trace);
+        }
+        else {
+            spdlog::set_level(spdlog::level::info);
+        }
+        std::cout<<"Setting Log level = "<<logLevel<<std::endl;
+    }
+    else{
+        std::cout<<"LogLevel not defined, setting default logLevel = INFO\n";
+        spdlog::set_level(spdlog::level::info);
+    }
+}

@@ -32,6 +32,24 @@ if (jsoncpp_FOUND)
 endif()
 
 
+find_package(spdlog 1.15.3 QUIET)
+if (spdlog_FOUND)
+    message(STATUS "## spdlog v1.15.3 logger library found in local")
+
+elseif(NOT spdlog_FOUND)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.15.3 # pin a release tag never a branch
+        GIT_SHALLOW     TRUE
+    )
+
+    FetchContent_MakeAvailable(spdlog)
+endif()
+
+
 # Add subdirectories containing other source files
 add_subdirectory(src)
 
@@ -41,23 +59,6 @@ add_subdirectory(src)
 # add_compile_options( -Werror)
 # message(STATUS "## Treat all warnings as errors")
 
-
-find_package(spdlog 1.17 QUIET)
-if (spdlog_FOUND)
-    message(STATUS "## spdlog logger library found")
-
-elseif(NOT spdlog_FOUND)
-    include(FetchContent)
-
-    FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG        v1.17.0 # pin a release tag never a branch
-        GIT_SHALOW     TRUE
-    )
-
-    FetchContent_MakeAvailable(spdlog)
-endif()
 
 # Create executable
 add_executable(${PROJECT_NAME} main.cpp)
@@ -72,4 +73,4 @@ target_link_libraries(${PROJECT_NAME} materialsProperty)
 # target_link_libraries(${PROJECT_NAME} srcFunction)
 
 # Link your executable to spdlog : This automatically handles include directories and compiler flags
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog_header_only)
+target_link_libraries(${PROJECT_NAME} spdlog::spdlog_header_only)

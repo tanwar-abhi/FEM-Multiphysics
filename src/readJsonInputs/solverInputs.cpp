@@ -110,14 +110,16 @@ bool SolverInput::readInputs(const std::string& inputFilePath)
             result = parseSolverFromSolverJson(inputFilePath);
             if (!result)
             {
-                std::cout<<"[Error] Failed to parse solver details from sovlerInputs json file.\n";
+                // std::cout<<"[Error] Failed to parse solver details from sovlerInputs json file.\n";
+                spdlog::critical("SolverInput::readInputs Failed to parse solver details from sovlerInputs json file.");
                 return result;
             }
             std::cout << "done reading the solver input file" << std::endl;
         }
         else
         {
-            std::cout<<"[Error] Failed to parse Equations details from sovlerInputs json file.\n";
+            // std::cout<<"[Error] Failed to parse Equations details from sovlerInputs json file.\n";
+            spdlog::critical("SolverInput::readInputs Failed to parse Equations details from sovlerInputs json file.");
             return result;
         }
     }
@@ -144,7 +146,7 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
 {
     std::ifstream solverJsonFile(jsonFileFullPath + fileName);
 
-    std::cout<<"[Debug] SolverInput::parseEquationFromSolverJson path solverJsonFile = "<<jsonFileFullPath + fileName<<std::endl;
+    spdlog::debug("SolverInput::parseEquationFromSolverJson path solverJsonFile = {}", jsonFileFullPath + fileName);
 
     if (!solverJsonFile.is_open()){
         throw std::runtime_error("[Error] SolverInput::parseEquationsFromSolverJson :: could not open solver input file");

@@ -25,17 +25,44 @@ std::string Material::getMaterialInputFileName() const
     return _materialInputFileName;
 }
 
+void Material::setInputsDirectory(const std::string& inputsFolderPath)
+{
+    _directoryInputs = inputsFolderPath;
+}
+
 std::string Material::getInputsDirectory() const
 {
     return _directoryInputs;
 }
+
+void Material::setName(const std::string& newName)
+{
+    name = newName;
+}
+
+std::string Material::getName() const
+{
+    return name;
+}
+
+void Material::setElementTagId(const int& value)
+{
+    elementTagId = value;
+}
+
+int Material::getElementTagId() const
+{
+    return elementTagId;
+}
+
 
 bool Material::readMaterialInputs()
 {
     bool result {false};
     try
     {
-        solid = Solid::readMaterialInputs();
+        Solid::readSolidMaterialInputs(getInputsDirectory() + getMaterialInputFileName(), solid);
+        // thermal = 
         result = true;
     }
     catch(const std::runtime_error& e)
