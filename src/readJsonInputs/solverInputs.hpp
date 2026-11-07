@@ -162,7 +162,7 @@ class SolverInput
 
     // Type of mass matrix
     // 0-> Lumped Mass matrix ; 1-> Consistent Mass Matrix
-    int massMatrixType;
+    int massMatrixType{0};
 
     std::vector<std::shared_ptr<Equation>> equations;
 

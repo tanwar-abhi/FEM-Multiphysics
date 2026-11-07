@@ -4,13 +4,13 @@
 
 MaterialThermal::MaterialThermal()
 {
-    std::cout<<"[INFO] intialized thermal material constructor\n";
+    spdlog::debug("MaterialThermal::MaterialThermal intialized thermal material constructor");
 }
 
 
 MaterialThermal::~MaterialThermal()
 {
-
+    spdlog::debug("MaterialThermal::~MaterialThermal destructor called");
 }
 
 

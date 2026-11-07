@@ -241,9 +241,9 @@ bool SolverInput::parseEquationsFromSolverJson(const std::string& jsonFileFullPa
                     eqn->ocType = equationInput[index]["ocType"].asInt();
                 }
             }
-            std::cout<<equations.size()<<"\n";
             equations.emplace_back(eqn);
-            // std::cout<<"after emplace_back"<<equations.size()<<"\n";x
+            spdlog::debug("SolverInput::parseEquationFromSolverJson after emplace_back equation.size = {}", equations.size());
+            // std::cout<<"after emplace_back"<<equations.size()<<"\n";
             equationReadingResult = true;
         }
     }

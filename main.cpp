@@ -33,8 +33,7 @@ int main()
 
     spdlog::info("Starting Multiphysics Simulator");
     const std::string inputsPath = std::filesystem::current_path().string() + "/sampleInputs/";
-    std::cout << "inputsPath = "<< inputsPath<<std::endl;
-    spdlog::debug("inputsPath = {}", inputsPath);
+    spdlog::debug("(main) inputsPath = {}", inputsPath);
 
     //Object containing mesh parts defined by the user in the parts Input file
     PartsInput partsInput;
@@ -49,6 +48,16 @@ int main()
         return -2;
     }
 
+    Material materialDetails(inputsPath);
+
+    if (materialDetails.readMaterialInputs())
+    {
+        spdlog::info("(main) material configs read successfully from file = {}", materialDetails.getMaterialInputFileName());
+    }
+    else {
+        spdlog::critical("(main) Failed to read materials data from file = {}", materialDetails.getMaterialInputFileName());
+        return -2;
+    }
 
     // // LinearElasticMaterial solid(inputsPath);
     // std::vector<Solid> materialsSolid(inputsPath);
@@ -82,11 +91,11 @@ void setSpdLogLevel(const std::string& envVariable)
         std::transform(logLevel.begin(), logLevel.end(), logLevel.begin(), ::toupper);
         std::cout<<"env variable logLevel defined = "<<logLevel<<std::endl;
 
-        if (logLevel == "DEBUG") {
-            spdlog::set_level(spdlog::level::debug);
-        }
-        else if (logLevel == "TRACE") {
+        if (logLevel == "TRACE") {
             spdlog::set_level(spdlog::level::trace);
+        }
+        else if (logLevel == "DEBUG") {
+            spdlog::set_level(spdlog::level::debug);
         }
         else {
             spdlog::set_level(spdlog::level::info);

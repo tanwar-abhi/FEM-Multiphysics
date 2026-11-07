@@ -62,7 +62,10 @@ bool Material::readMaterialInputs()
     try
     {
         Solid::readSolidMaterialInputs(getInputsDirectory() + getMaterialInputFileName(), solid);
-        // thermal = 
+        spdlog::debug("Material::readMaterialInputs readSolidMaterialInputs read material config success");
+
+        // thermal = MaterialThermal::readMaterialInputs();
+        // spdlog::debug("Material::readMaterialInputs readMaterialInputs read material config success");
         result = true;
     }
     catch(const std::runtime_error& e)

@@ -4,13 +4,14 @@
 
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/json.h>
+#include <spdlog/spdlog.h>
 
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <optional>
 
-#include "materialBase.hpp"
+// #include "materialBase.hpp"
 
 
 enum class ThermalMaterialType

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "solverInputs.hpp"
-#include "materialBase.hpp"
+// #include "materialBase.hpp"
 
+#include <spdlog/spdlog.h>
 #include <Eigen/Core>
 
 #include <optional>
